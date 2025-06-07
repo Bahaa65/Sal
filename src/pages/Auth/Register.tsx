@@ -44,7 +44,7 @@ const Register = () => {
     console.log({ name, email, password })
   }
 
-  const bgColor = useColorModeValue('brand.50', 'gray.700');
+  const bgColor = useColorModeValue('#EBFBFF', 'gray.700');
 
   return (
     <Flex
@@ -55,48 +55,76 @@ const Register = () => {
       p={4}
       direction={{ base: 'column', md: 'row' }}
     >
-      {/* Left Section - Register Form */}
-      <Box
-        bg={bgColor}
+      <HStack
+        spacing={0}
         borderRadius="2xl"
         boxShadow="xl"
-        p={8}
-        mx={{ base: 0, md: 4 }}
-        my={{ base: 4, md: 0 }}
-        maxW={{ base: 'md', md: 'xl' }}
-        flex="1"
+        width="full"
+        overflow="hidden"
       >
-        <VStack spacing={6} align="stretch">
+        {/* Left Section - Illustration */}
+        <Box
+          flex="1"
+          bg="white"
+          p={8}
+          display={{ base: 'none', md: 'flex' }} // Hide on small screens
+          justifyContent="center"
+          alignItems="center"
+        >
           <Image
-            src="/images/logo.png"
-            alt="Sal Logo"
-            maxW="150px" 
-            mb={6}
-            mx="auto"
+            src="/images/5167170.png" // Using the provided image for the illustration
+            alt="People asking questions illustration"
+            maxH="500px"
+            objectFit="contain"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "https://via.placeholder.com/500x400?text=Register+Illustration";
+            }}
           />
+        </Box>
 
-          <HStack justify="center" spacing={0} borderRadius="full" bg="white" p={1}>
-            <Button
-              as={RouterLink}
-              to="/login"
-              variant="outline"
-              colorScheme="brand"
-              borderRadius="full"
-              px={6}
-              flex="1"
-              _hover={{ textDecoration: 'none' }}
-            >
-              Sign in
-            </Button>
-            <Button
+        {/* Right Section - Register Form */}
+        <Box
+          bg={bgColor}
+          p={8}
+          flex="1"
+        >
+          <VStack spacing={6} align="stretch">
+            <Image
+              src="/images/logo.png" // Path to your Logo image
+              alt="Sal Logo"
+              maxW="150px" // Adjust size as needed
+              mb={6}
+              mx="auto"
+            />
+
+            <HStack justify="center" spacing={0} borderRadius="full" bg="white" p={1}>
+              <Button
+                as={RouterLink}
+                to="/login"
+                variant="ghost"
+                borderRadius="full"
+                h="32px"
+                fontSize="sm"
+                px={4}
+                flex="1"
+                color="#0078D4"
+                _hover={{ bg: '#0078D4', color: 'white', textDecoration: 'none' }}
+              >
+                Sign in
+              </Button>
+              <Button
                 as={RouterLink}
                 to="/register"
-                colorScheme="brand"
                 variant="solid"
                 borderRadius="full"
-                px={6}
+                h="32px"
+                fontSize="sm"
+                px={4}
                 flex="1"
-                _hover={{ textDecoration: 'none' }}
+                bg="#0078D4"
+                color="white"
+                _hover={{ bg: '#006CBE', textDecoration: 'none' }}
               >
                 Sign up
               </Button>
@@ -104,17 +132,49 @@ const Register = () => {
 
             <form onSubmit={handleSignUp}>
               <VStack spacing={4} mt={6}>
-                <FormControl id="name" isRequired>
-                  <FormLabel srOnly>Name</FormLabel>
+                <HStack spacing={4} width="full">
+                  <FormControl id="first-name" isRequired>
+                    <FormLabel srOnly>First Name</FormLabel>
+                    <Input
+                      type="text"
+                      placeholder="First name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      bg="white"
+                      borderRadius="full"
+                      boxShadow="sm"
+                      h="58px"
+                      pl={4}
+                    />
+                  </FormControl>
+
+                  <FormControl id="last-name" isRequired>
+                    <FormLabel srOnly>Last Name</FormLabel>
+                    <Input
+                      type="text"
+                      placeholder="Last Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      bg="white"
+                      borderRadius="full"
+                      boxShadow="sm"
+                      h="58px"
+                      pl={4}
+                    />
+                  </FormControl>
+                </HStack>
+
+                <FormControl id="job-title" isRequired>
+                  <FormLabel srOnly>Job title</FormLabel>
                   <Input
                     type="text"
-                    placeholder="Name"
+                    placeholder="Job title"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     bg="white"
-                    borderRadius="md"
+                    borderRadius="full"
                     boxShadow="sm"
-                    py={6}
+                    h="58px"
                     pl={4}
                   />
                 </FormControl>
@@ -127,9 +187,9 @@ const Register = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     bg="white"
-                    borderRadius="md"
+                    borderRadius="full"
                     boxShadow="sm"
-                    py={6}
+                    h="58px"
                     pl={4}
                   />
                 </FormControl>
@@ -142,9 +202,9 @@ const Register = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     bg="white"
-                    borderRadius="md"
+                    borderRadius="full"
                     boxShadow="sm"
-                    py={6}
+                    h="58px"
                     pl={4}
                   />
                 </FormControl>
@@ -157,14 +217,23 @@ const Register = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     bg="white"
-                    borderRadius="md"
+                    borderRadius="full"
                     boxShadow="sm"
-                    py={6}
+                    h="58px"
                     pl={4}
                   />
                 </FormControl>
 
-                <Button type="submit" colorScheme="brand" size="lg" width="full" borderRadius="lg" mt={4}>
+                <Button 
+                  type="submit" 
+                  width="full" 
+                  borderRadius="lg" 
+                  mt={4}
+                  h="58px"
+                  bg="#0078D4"
+                  color="white"
+                  _hover={{ bg: '#006CBE' }}
+                >
                   Sign up
                 </Button>
               </VStack>
@@ -177,48 +246,23 @@ const Register = () => {
             </Flex>
 
             <Button
-              leftIcon={<Box as="span" className="icon-github" fontSize="xl" />} // Placeholder for GitHub icon
+              leftIcon={<Box as="span" className="icon-github" fontSize="xl" />} 
               bg="black"
               color="white"
               _hover={{ bg: 'gray.800' }}
               variant="solid"
-              size="lg"
               width="full"
               borderRadius="lg"
+              h="58px"
               onClick={() => console.log('Sign up with GitHub')}
             >
               Sign up with GitHub
             </Button>
           </VStack>
         </Box>
-
-        {/* Right Section - Illustration */}
-        <Box
-          flex="1"
-          bg="white"
-          borderRadius="2xl"
-          boxShadow="xl"
-          p={8}
-          mx={{ base: 0, md: 4 }}
-          my={{ base: 4, md: 0 }}
-          maxW={{ base: 'md', md: 'xl' }}
-          display={{ base: 'none', md: 'flex' }} 
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Image
-            src="/images/5167170.png" 
-            alt="People asking questions illustration"
-            maxH="500px"
-            objectFit="contain"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "https://via.placeholder.com/500x400?text=Register+Illustration";
-            }}
-          />
-        </Box>
+      </HStack>
     </Flex>
   )
 }
 
-export default Register 
+export default Register
