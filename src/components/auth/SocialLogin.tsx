@@ -15,7 +15,6 @@ const SocialLogin = ({ onGithubClick }: SocialLoginProps) => {
       </Flex>
 
       <Button
-        leftIcon={<Icon as={FaGithub} boxSize={5} />}
         bg="black"
         color="white"
         _hover={{ bg: 'white', color: 'black', border: '1px solid', borderColor: 'black' }}
@@ -26,7 +25,17 @@ const SocialLogin = ({ onGithubClick }: SocialLoginProps) => {
         borderRadius="full"
         h="45px"
         onClick={onGithubClick}
+        position="relative"
+        pl={12}
       >
+        <Icon 
+          as={FaGithub} 
+          boxSize={5} 
+          position="absolute"
+          left={4}
+          top="50%"
+          transform="translateY(-50%)"
+        />
         Sign in with GitHub
       </Button>
     </>
