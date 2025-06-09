@@ -16,12 +16,10 @@ const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children }: A
     const formData = new FormData(event.currentTarget)
     const values: Record<string, string> = {}
     
-    // Collect values from all input fields in the form
     formData.forEach((value, key) => {
       values[key] = value as string
     })
 
-    // Basic validation for empty fields if isRequired is present on the input
     const inputs = event.currentTarget.querySelectorAll('input[required]')
     let allFieldsFilled = true
     inputs.forEach(input => {

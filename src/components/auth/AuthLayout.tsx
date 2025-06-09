@@ -35,6 +35,8 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
           alignItems="center"
           borderRight="1px solid"
           borderColor="gray.200"
+          height="100vh"
+          width="100%"
         >
           <Image
             src="/images/5167170.png"
