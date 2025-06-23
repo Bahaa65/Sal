@@ -17,7 +17,9 @@ const HomeHeader = () => {
       boxShadow="md"
     >
       <HStack spacing="18px" mr={4} minW="224px" maxW="224px" w="224px" justify="flex-start">
-        <Avatar w="40px" h="40px" name={user ? `${user.first_name} ${user.last_name}` : ''} src={user?.avatar} />
+        <Box as={RouterLink} to="/profile">
+          <Avatar w="40px" h="40px" name={user ? `${user.first_name} ${user.last_name}` : ''} src={user?.avatar} cursor="pointer" />
+        </Box>
         <IconButton
           aria-label="Help"
           icon={<QuestionOutlineIcon boxSize="20px" color="white" />}

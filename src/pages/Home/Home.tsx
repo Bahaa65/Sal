@@ -1,33 +1,10 @@
-import { useState } from 'react';
 import { Box, Container, useDisclosure, Spinner, Flex, Text } from '@chakra-ui/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import HomeHeader from '../../components/home/HomeHeader';
+import MainLayout from '../../components/home/MainLayout';
 import AskQuestionBox from '../../components/home/AskQuestionBox';
 import QuestionModal from '../../components/home/QuestionModal';
 import QuestionCard from '../../components/home/QuestionCard';
 import apiClient from '../../services/apiClient';
-
-// This type should ideally be in a shared types file
-type UserType = {
-  id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  avatar?: string;
-  job?: string;
-};
-
-// This type should also be in a shared types file
-type QuestionType = {
-  id: number;
-  user: UserType;
-  content: string;
-  upvotes: number;
-  downvotes: number;
-  answers_count: number;
-  created_at: string;
-};
 
 // Define the function to fetch questions
 const fetchQuestions = async () => {
@@ -39,8 +16,8 @@ const fetchQuestions = async () => {
 };
 
 // Define the function to add a new question
-const addQuestion = async (content: string) => {
-  const { data } = await apiClient.post('/questions', { content });
+const addQuestion = async (newQuestion: { content: string }) => {
+  const { data } = await apiClient.post('/questions', newQuestion);
   return data;
 };
 
@@ -66,14 +43,12 @@ const Home = () => {
     // You can also add onError to handle mutation errors with a toast, for example
   });
 
-  const handleAddQuestion = (newQuestionContent: string) => {
-    mutation.mutate(newQuestionContent);
+  const handleAddQuestion = (newQuestionData: { content: string }) => {
+    mutation.mutate(newQuestionData);
   };
 
   return (
-    <Box bg="gray.100" minH="100vh">
-      <HomeHeader />
-
+    <MainLayout>
       <Container maxW="container.md" py={8}>
         <AskQuestionBox onClick={onOpen} />
 
@@ -100,7 +75,7 @@ const Home = () => {
           isSubmitting={mutation.isPending} // Pass mutation loading state to modal
         />
       </Container>
-    </Box>
+    </MainLayout>
   );
 };
 

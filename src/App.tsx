@@ -8,6 +8,7 @@ import Home from './pages/Home/Home'
 import { AuthProvider } from './contexts/AuthContext'
 import AuthGuard from './components/common/AuthGuard'
 import GuestGuard from './components/common/GuestGuard'
+import Profile from './pages/Profile/Profile'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -25,6 +26,14 @@ function App() {
                 element={
                   <AuthGuard>
                     <Home />
+                  </AuthGuard>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <AuthGuard>
+                    <Profile />
                   </AuthGuard>
                 }
               />

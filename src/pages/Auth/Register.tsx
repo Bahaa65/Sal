@@ -223,7 +223,7 @@ const Register = () => {
                   }}
                 />
               </FormControl>
-              
+
               <FormControl id="password" isRequired>
                 <FormLabel srOnly>كلمة المرور</FormLabel>
                 <Input
