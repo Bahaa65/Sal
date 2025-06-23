@@ -10,6 +10,12 @@ import {
   Button,
   Collapse,
   Spinner,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Icon,
+  useToast,
 } from "@chakra-ui/react";
 import { UpDownIcon } from "@chakra-ui/icons";
 import {
@@ -17,12 +23,18 @@ import {
   FiArrowDown,
   FiMessageCircle,
   FiEdit,
+  FiMoreVertical,
+  FiUser,
+  FiEye,
+  FiFlag,
+  FiX,
 } from "react-icons/fi";
 import AnswerModal from "./AnswerModal";
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "../../services/apiClient";
 import AnswerCard from "./AnswerCard";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Assuming a User type similar to what's in AuthContext
 // This could be imported from a shared types file in a larger app
@@ -32,6 +44,7 @@ type User = {
   last_name: string;
   avatar?: string;
   job?: string;
+  username?: string;
 };
 
 type Answer = {
@@ -64,6 +77,10 @@ const fetchAnswers = async (questionId: number) => {
 const QuestionCard = ({ question }: QuestionCardProps) => {
   const { isOpen: isModalOpen, onOpen, onClose } = useDisclosure();
   const [showAnswers, setShowAnswers] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
+  const navigate = useNavigate();
+  const toast = useToast();
 
   const {
     data: answers,
@@ -79,6 +96,29 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     setShowAnswers(!showAnswers);
   };
 
+  const handleReport = async () => {
+    if (!window.confirm("هل أنت متأكد أنك تريد الإبلاغ عن هذا السؤال؟")) return;
+    setIsReporting(true);
+    try {
+      await apiClient.post("/report/question", { question_id: question.id });
+      toast({ title: "تم إرسال الإبلاغ بنجاح.", status: "success" });
+    } catch (e) {
+      toast({ title: "حدث خطأ أثناء الإبلاغ.", status: "error" });
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
+  const handleHide = () => {
+    setHidden(true);
+  };
+
+  const handleViewProfile = () => {
+    navigate(`/users/${question.user.username || question.user.id}`);
+  };
+
+  if (hidden) return null;
+
   return (
     <>
       <Box bg="white" borderRadius="lg" boxShadow="md" p={4} mb={6}>
@@ -89,13 +129,17 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
             <Text fontSize="sm" color="gray.500">{question.job_title || question.user.job || 'No job title'}</Text>
           </Box>
           <Spacer />
-          {/* Three dots icon - you might need a custom icon or a Chakra component */}
-          <IconButton
-            aria-label="Options"
-            icon={<Box as={UpDownIcon} transform="rotate(90deg)" />} // A simple placeholder for now
-            variant="ghost"
-            size="sm"
-          />
+          <Menu>
+            <MenuButton as={IconButton} icon={<Icon as={FiMoreVertical} />} variant="ghost" size="sm" />
+            <MenuList>
+              <MenuItem icon={<Icon as={FiX} />} onClick={handleHide}>
+                Hide Question
+              </MenuItem>
+              <MenuItem icon={<Icon as={FiUser} />} onClick={handleViewProfile}>
+                View Publisher Profile
+              </MenuItem>
+            </MenuList>
+          </Menu>
         </Flex>
 
         <Box mb={4}>

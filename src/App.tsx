@@ -39,6 +39,14 @@ function App() {
                 }
               />
               <Route
+                path="/users/:username"
+                element={
+                  <AuthGuard>
+                    <Profile />
+                  </AuthGuard>
+                }
+              />
+              <Route
                 path="/notifications"
                 element={
                   <AuthGuard>

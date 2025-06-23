@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Avatar,
@@ -14,6 +15,7 @@ import MainLayout from '../../components/home/MainLayout';
 import EditProfileModal from './EditProfileModal';
 
 const Profile = () => {
+  const { username } = useParams();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<any[]>([]);
@@ -23,16 +25,23 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await apiClient.get("/profile");
-        setUser(data.data);
+        let data;
+        if (username) {
+          const res = await apiClient.get(`/users/${username}`);
+          data = res.data.data;
+        } else {
+          const res = await apiClient.get("/profile");
+          data = res.data.data;
+        }
+        setUser(data);
       } catch (error) {
-        // handle error
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
     fetchProfile();
-  }, []);
+  }, [username]);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -73,7 +82,14 @@ const Profile = () => {
           <Text fontWeight="bold" fontSize="2xl" mt={2}>{user.full_name}</Text>
           <Text color="gray.600" fontSize="md">{user.job || "No job title"}</Text>
           <Text color="gray.500" mt={2}>{user.bio}</Text>
-          <Button mt={4} colorScheme="blue" onClick={onOpen}>Edit Profile</Button>
+          {!username && (
+            <Button mt={4} colorScheme="blue" onClick={onOpen}>Edit Profile</Button>
+          )}
+          {username && (
+            <Box mt={2} mb={2} px={3} py={1} bg="gray.100" borderRadius="full" fontSize="sm" color="gray.600">
+              User Profile
+            </Box>
+          )}
         </Flex>
         {/* مكان عرض الأسئلة */}
         <Box mt={10}>
@@ -93,12 +109,14 @@ const Profile = () => {
             </VStack>
           )}
         </Box>
-        <EditProfileModal
-          isOpen={isOpen}
-          onClose={onClose}
-          user={user}
-          onProfileUpdated={setUser}
-        />
+        {!username && (
+          <EditProfileModal
+            isOpen={isOpen}
+            onClose={onClose}
+            user={user}
+            onProfileUpdated={setUser}
+          />
+        )}
       </Box>
     </MainLayout>
   );

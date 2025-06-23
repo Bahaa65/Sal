@@ -1,5 +1,7 @@
-import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer } from '@chakra-ui/react';
-import { FiArrowUp, FiArrowDown } from 'react-icons/fi';
+import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer, Menu, MenuButton, MenuList, MenuItem, Icon, useToast } from '@chakra-ui/react';
+import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 // This should ideally come from a shared types file
 type User = {
@@ -8,6 +10,7 @@ type User = {
   last_name: string;
   avatar?: string;
   job?: string;
+  username?: string;
 };
 
 // This should ideally come from a shared types file
@@ -26,6 +29,19 @@ type AnswerCardProps = {
 };
 
 const AnswerCard = ({ answer }: AnswerCardProps) => {
+  const [hidden, setHidden] = useState(false);
+  const navigate = useNavigate();
+  const toast = useToast();
+
+  const handleHide = () => {
+    setHidden(true);
+  };
+  const handleViewProfile = () => {
+    navigate(`/users/${answer.user.username || answer.user.id}`);
+  };
+
+  if (hidden) return null;
+
   return (
     <Box borderWidth="1px" borderRadius="lg" p={4} mt={4} bg="gray.50">
       <Flex align="center" mb={3}>
@@ -34,6 +50,18 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
           <Text fontWeight="bold" fontSize="sm">{`${answer.user.first_name} ${answer.user.last_name}`}</Text>
           <Text fontSize="xs" color="gray.500">{answer.user.job || 'No job title'}</Text>
         </Box>
+        <Spacer />
+        <Menu>
+          <MenuButton as={IconButton} icon={<Icon as={FiMoreVertical} />} variant="ghost" size="sm" />
+          <MenuList>
+            <MenuItem icon={<Icon as={FiX} />} onClick={handleHide}>
+              Hide Comment
+            </MenuItem>
+            <MenuItem icon={<Icon as={FiUser} />} onClick={handleViewProfile}>
+              View Publisher Profile
+            </MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
 
       <Text mb={3}>{answer.content}</Text>
