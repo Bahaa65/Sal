@@ -18,6 +18,7 @@ type Answer = {
   upvotes: number;
   downvotes: number;
   created_at: string;
+  images?: string[];
 };
 
 type AnswerCardProps = {
@@ -36,6 +37,17 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
       </Flex>
 
       <Text mb={3}>{answer.content}</Text>
+
+      {/* عرض الصور إذا وُجدت */}
+      {answer.images && answer.images.length > 0 && (
+        <Flex gap={2} mb={3} wrap="wrap">
+          {answer.images.map((img, idx) => (
+            <Box key={img + idx} display="inline-block">
+              <img src={img} alt={`answer-img-${idx}`} style={{ maxWidth: 120, maxHeight: 120, borderRadius: 8, border: '1px solid #eee' }} />
+            </Box>
+          ))}
+        </Flex>
+      )}
 
       <Flex align="center" fontSize="sm" color="gray.600">
         <HStack spacing={1} mr={4}>

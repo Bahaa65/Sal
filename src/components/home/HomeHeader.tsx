@@ -1,11 +1,18 @@
-import { Box, Flex, Input, InputGroup, InputLeftElement, Avatar, IconButton, HStack, Spacer, Image, Text } from '@chakra-ui/react';
+import { Box, Flex, Input, InputGroup, InputLeftElement, Avatar, IconButton, HStack, Spacer, Image, Text, Badge } from '@chakra-ui/react';
 import { SearchIcon, BellIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
 import { FaHome } from "react-icons/fa";
 import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { fetchNotifications } from '../../services/notifications';
 
 const HomeHeader = () => {
   const { user } = useAuth();
+
+  const { data } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: fetchNotifications,
+  });
 
   return (
     <Flex
@@ -31,12 +38,30 @@ const HomeHeader = () => {
         />
         <IconButton
           aria-label="Notifications"
-          icon={<BellIcon boxSize="20px" color="white" />}
+          icon={
+            <Box position="relative">
+              <BellIcon boxSize="20px" color="white" />
+              {data?.unread_count > 0 && (
+                <Badge
+                  colorScheme="red"
+                  borderRadius="full"
+                  position="absolute"
+                  top="-1"
+                  right="-1"
+                  fontSize="0.7em"
+                >
+                  {data.unread_count}
+                </Badge>
+              )}
+            </Box>
+          }
           isRound={true}
           size="md"
           bg="transparent"
           color="white"
           _hover={{ bg: 'blue.600' }}
+          as={RouterLink}
+          to="/notifications"
         />
         <IconButton
           aria-label="Home"

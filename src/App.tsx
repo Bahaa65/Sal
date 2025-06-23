@@ -9,6 +9,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import AuthGuard from './components/common/AuthGuard'
 import GuestGuard from './components/common/GuestGuard'
 import Profile from './pages/Profile/Profile'
+import NotificationsPage from './pages/Home/Notifications'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -18,7 +19,7 @@ function App() {
     <ChakraProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Router>
+      <Router>
             <Routes>
               {/* Protected Routes */}
               <Route
@@ -34,6 +35,14 @@ function App() {
                 element={
                   <AuthGuard>
                     <Profile />
+                  </AuthGuard>
+                }
+              />
+              <Route
+                path="/notifications"
+                element={
+                  <AuthGuard>
+                    <NotificationsPage />
                   </AuthGuard>
                 }
               />
@@ -59,7 +68,7 @@ function App() {
               {/* Fallback route */}
               <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>
-          </Router>
+      </Router>
         </AuthProvider>
       </QueryClientProvider>
     </ChakraProvider>

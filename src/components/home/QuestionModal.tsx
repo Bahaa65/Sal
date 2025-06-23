@@ -12,7 +12,6 @@ import {
   Avatar,
   Text,
   VStack,
-  Input,
   Box,
   Checkbox,
 } from "@chakra-ui/react";
