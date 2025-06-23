@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, Button, Text, VStack, HStack, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
-import { apiService } from '../../services/api.service';
 
 const ConnectionTest: React.FC = () => {
   const [isTesting, setIsTesting] = useState(false);
@@ -15,7 +14,7 @@ const ConnectionTest: React.FC = () => {
     setTestResult(null);
 
     try {
-      // اختبار الاتصال بالخادم
+      // Test server connection
       const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/questions/', {
         method: 'GET',
         headers: {
@@ -26,7 +25,7 @@ const ConnectionTest: React.FC = () => {
       if (response.ok) {
         setTestResult({
           success: true,
-          message: 'الاتصال بالخادم يعمل بشكل صحيح',
+          message: 'Server connection is working correctly',
           details: {
             status: response.status,
             statusText: response.statusText,
@@ -35,7 +34,7 @@ const ConnectionTest: React.FC = () => {
       } else {
         setTestResult({
           success: false,
-          message: `خطأ في الخادم: ${response.status} ${response.statusText}`,
+          message: `Server error: ${response.status} ${response.statusText}`,
           details: {
             status: response.status,
             statusText: response.statusText,
@@ -45,7 +44,7 @@ const ConnectionTest: React.FC = () => {
     } catch (error: any) {
       setTestResult({
         success: false,
-        message: `خطأ في الاتصال: ${error.message}`,
+        message: `Connection error: ${error.message}`,
         details: error
       });
     } finally {
@@ -58,7 +57,7 @@ const ConnectionTest: React.FC = () => {
     setTestResult(null);
 
     try {
-      // اختبار الاتصال باستخدام proxy
+      // Test connection using proxy
       const proxyUrl = 'https://api.allorigins.win/raw?url=https://hossamoka4a.pythonanywhere.com/api/questions/';
       const response = await fetch(proxyUrl, {
         method: 'GET',
@@ -70,7 +69,7 @@ const ConnectionTest: React.FC = () => {
       if (response.ok) {
         setTestResult({
           success: true,
-          message: 'الاتصال باستخدام Proxy يعمل بشكل صحيح',
+          message: 'Proxy connection is working correctly',
           details: {
             status: response.status,
             statusText: response.statusText,
@@ -79,7 +78,7 @@ const ConnectionTest: React.FC = () => {
       } else {
         setTestResult({
           success: false,
-          message: `خطأ في Proxy: ${response.status} ${response.statusText}`,
+          message: `Proxy error: ${response.status} ${response.statusText}`,
           details: {
             status: response.status,
             statusText: response.statusText,
@@ -89,7 +88,7 @@ const ConnectionTest: React.FC = () => {
     } catch (error: any) {
       setTestResult({
         success: false,
-        message: `خطأ في الاتصال بالـ Proxy: ${error.message}`,
+        message: `Proxy connection error: ${error.message}`,
         details: error
       });
     } finally {
@@ -100,7 +99,7 @@ const ConnectionTest: React.FC = () => {
   return (
     <Box p={4} borderWidth="1px" borderRadius="lg" bg="white">
       <VStack spacing={4} align="stretch">
-        <Text fontSize="lg" fontWeight="bold">اختبار الاتصال بالخادم</Text>
+        <Text fontSize="lg" fontWeight="bold">Test server connection</Text>
         
         <HStack spacing={4}>
           <Button 
@@ -109,7 +108,7 @@ const ConnectionTest: React.FC = () => {
             isLoading={isTesting}
             loadingText="جاري الاختبار..."
           >
-            اختبار الاتصال المباشر
+            Test direct connection
           </Button>
           
           <Button 
@@ -118,7 +117,7 @@ const ConnectionTest: React.FC = () => {
             isLoading={isTesting}
             loadingText="جاري الاختبار..."
           >
-            اختبار الاتصال بالـ Proxy
+            Test Proxy connection
           </Button>
         </HStack>
 
@@ -127,13 +126,13 @@ const ConnectionTest: React.FC = () => {
             <AlertIcon />
             <Box>
               <AlertTitle>
-                {testResult.success ? 'نجح الاختبار' : 'فشل الاختبار'}
+                {testResult.success ? 'Test passed' : 'Test failed'}
               </AlertTitle>
               <AlertDescription>
                 {testResult.message}
                 {testResult.details && (
                   <Text fontSize="sm" mt={2}>
-                    التفاصيل: {JSON.stringify(testResult.details, null, 2)}
+                    Details: {JSON.stringify(testResult.details, null, 2)}
                   </Text>
                 )}
               </AlertDescription>
