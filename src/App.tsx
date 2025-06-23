@@ -1,46 +1,58 @@
 import { ChakraProvider } from '@chakra-ui/react'
-import { AnimatePresence } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import theme from './theme'
 import Login from './pages/Auth/Login' 
 import Register from './pages/Auth/Register'
 import Home from './pages/Home/Home'
-import PageTransition from './components/PageTransition'
+import { AuthProvider } from './contexts/AuthContext'
+import AuthGuard from './components/common/AuthGuard'
+import GuestGuard from './components/common/GuestGuard'
 
-function AppRoutes() {
-  const location = useLocation()
-
-  return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/login" element={
-          <PageTransition>
-            <Login />
-          </PageTransition>
-        } />
-        <Route path="/register" element={
-          <PageTransition>
-            <Register />
-          </PageTransition>
-        } />
-        <Route path="/home" element={
-          <PageTransition>
-            <Home />
-          </PageTransition>
-        } />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </AnimatePresence>
-  )
-}
+// Create a client
+const queryClient = new QueryClient()
 
 function App() {
   return (
     <ChakraProvider theme={theme}>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Router>
+            <Routes>
+              {/* Protected Routes */}
+              <Route
+                path="/home"
+                element={
+                  <AuthGuard>
+                    <Home />
+                  </AuthGuard>
+                }
+              />
+
+              {/* Guest-only Routes */}
+              <Route
+                path="/login"
+                element={
+                  <GuestGuard>
+                    <Login />
+                  </GuestGuard>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <GuestGuard>
+                    <Register />
+                  </GuestGuard>
+                }
+              />
+
+              {/* Fallback route */}
+              <Route path="*" element={<Navigate to="/home" replace />} />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </QueryClientProvider>
     </ChakraProvider>
   )
 }

@@ -6,13 +6,20 @@ interface AuthFormProps {
   submitButtonText: string
   formFieldsContent: ReactNode
   children?: ReactNode
+  isSubmitting?: boolean
 }
 
-const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children }: AuthFormProps) => {
+const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children, isSubmitting = false }: AuthFormProps) => {
   const toast = useToast()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    
+    // منع الإرسال إذا كان في حالة تحميل
+    if (isSubmitting) {
+      return
+    }
+    
     const formData = new FormData(event.currentTarget)
     const values: Record<string, string> = {}
     
@@ -57,6 +64,9 @@ const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children }: A
           bg="#0078D4"
           color="white"
           _hover={{ bg: '#006CBE' }}
+          isLoading={isSubmitting}
+          loadingText="جاري..."
+          isDisabled={isSubmitting}
         >
           {submitButtonText}
         </Button>

@@ -1,30 +1,107 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Box, Container, useDisclosure, Spinner, Flex, Text } from '@chakra-ui/react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import HomeHeader from '../../components/home/HomeHeader';
-import QuestionInputBox from '../../components/home/QuestionInputBox';
+import AskQuestionBox from '../../components/home/AskQuestionBox';
+import QuestionModal from '../../components/home/QuestionModal';
 import QuestionCard from '../../components/home/QuestionCard';
-import LoadMoreButton from '../../components/home/LoadMoreButton';
-import HomeLayout from '../../components/home/HomeLayout';
+import apiClient from '../../services/apiClient';
+
+// This type should ideally be in a shared types file
+type UserType = {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar?: string;
+  job?: string;
+};
+
+// This type should also be in a shared types file
+type QuestionType = {
+  id: number;
+  user: UserType;
+  content: string;
+  upvotes: number;
+  downvotes: number;
+  answers_count: number;
+  created_at: string;
+};
+
+// Define the function to fetch questions
+const fetchQuestions = async () => {
+  const { data } = await apiClient.get('/questions');
+  if (data && data.success) {
+    return data.data; // The backend returns questions in a 'data' property
+  }
+  throw new Error('Failed to fetch questions');
+};
+
+// Define the function to add a new question
+const addQuestion = async (content: string) => {
+  const { data } = await apiClient.post('/questions', { content });
+  return data;
+};
 
 const Home = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const queryClient = useQueryClient();
+
+  // Use useQuery to fetch questions
+  const { data: questions, isLoading, isError, error } = useQuery({
+    queryKey: ['questions'],
+    queryFn: fetchQuestions,
+  });
+
+  // Use useMutation to add a new question
+  const mutation = useMutation({
+    mutationFn: addQuestion,
+    onSuccess: () => {
+      // When a new question is added successfully, invalidate the 'questions' query
+      // This will cause React Query to refetch the questions and update the UI
+      queryClient.invalidateQueries({ queryKey: ['questions'] });
+      onClose(); // Close the modal
+    },
+    // You can also add onError to handle mutation errors with a toast, for example
+  });
+
+  const handleAddQuestion = (newQuestionContent: string) => {
+    mutation.mutate(newQuestionContent);
+  };
+
   return (
-    <HomeLayout>
+    <Box bg="gray.100" minH="100vh">
       <HomeHeader />
 
-      {/* Main Content Area */}
-      <Flex justify="center" p="16px">
-        <Box maxW="720px" width="full">
-          <QuestionInputBox />
+      <Container maxW="container.md" py={8}>
+        <AskQuestionBox onClick={onOpen} />
 
-          {/* Question Cards will go here */}
-          <QuestionCard />
-        </Box>
-      </Flex>
-      {/* Load More Button */}
-      <Flex justify="center" mt="24px">
-        <LoadMoreButton />
-      </Flex>
-    </HomeLayout>
+        {isLoading && (
+          <Flex justify="center" align="center" py={10}>
+            <Spinner size="xl" />
+          </Flex>
+        )}
+
+        {isError && (
+          <Box my={4} p={4} bg="red.100" borderRadius="md">
+            <Text color="red.700">Error fetching questions: {error.message}</Text>
+          </Box>
+        )}
+
+        {questions && questions.map((q: any) => (
+          <QuestionCard key={q.id} question={q} />
+        ))}
+
+        <QuestionModal
+          isOpen={isOpen}
+          onClose={onClose}
+          onSubmit={handleAddQuestion}
+          isSubmitting={mutation.isPending} // Pass mutation loading state to modal
+        />
+      </Container>
+    </Box>
   );
 };
 
-export default Home; 
+export default Home;

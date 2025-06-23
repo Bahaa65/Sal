@@ -2,6 +2,7 @@ import { FormControl, FormLabel, Input, useToast, HStack, VStack } from '@chakra
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 import AuthLayout from '../../components/auth/AuthLayout'
 import AuthForm from '../../components/auth/AuthForm'
 import AuthHeader from '../../components/auth/AuthHeader'
@@ -11,24 +12,38 @@ import { staggerContainer, staggerItem } from '../../components/common/animation
 const MotionVStack = motion.create(VStack)
 
 const Register = () => {
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [jobTitle, setJobTitle] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [formData, setFormData] = useState({
+    first_name: '',
+    last_name: '',
+    username: '',
+    email: '',
+    password: '',
+  })
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const toast = useToast()
   const navigate = useNavigate()
+  const { register } = useAuth()
 
-  const handleRegister = (values: Record<string, string>) => {
-    const currentFirstName = values.firstName || firstName;
-    const currentLastName = values.lastName || lastName;
-    const currentJobTitle = values.jobTitle || jobTitle;
-    const currentEmail = values.email || email;
-    const currentPassword = values.password || password;
-    const currentConfirmPassword = values.confirmPassword || confirmPassword;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-    if (currentPassword !== currentConfirmPassword) {
+  const handleRegister = async () => {
+    if (Object.values(formData).some(value => value === '')) {
+      toast({
+        title: 'خطأ في البيانات',
+        description: 'يرجى تعبئة جميع الحقول المطلوبة',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      })
+      return
+    }
+
+    if (formData.password !== confirmPassword) {
       toast({
         title: 'خطأ',
         description: 'كلمتا المرور غير متطابقتين.',
@@ -40,20 +55,46 @@ const Register = () => {
       return
     }
 
-    console.log('Register values:', { firstName: currentFirstName, lastName: currentLastName, jobTitle: currentJobTitle, email: currentEmail, password: currentPassword, confirmPassword: currentConfirmPassword })
-    toast({
-      title: 'تسجيل ناجح',
-      description: `مرحباً بك يا ${currentFirstName}! تم تسجيل حسابك بنجاح.`,
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-      position: 'top-right',
-    })
-    navigate('/home')
+    try {
+      setIsSubmitting(true)
+      await register(formData)
+      
+      toast({
+        title: 'تسجيل ناجح',
+        description: `مرحباً بك يا ${formData.first_name}! تم تسجيل حسابك بنجاح.`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      })
+      
+      navigate('/home')
+    } catch (error: any) {
+      console.error('Registration error:', error)
+      
+      toast({
+        title: 'خطأ في التسجيل',
+        description: error.message || 'حدث خطأ أثناء إنشاء الحساب',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top-right',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleGithubLogin = () => {
     console.log('GitHub login clicked')
+    toast({
+      title: 'قريباً',
+      description: 'سيتم إضافة تسجيل الدخول بـ GitHub قريباً',
+      status: 'info',
+      duration: 3000,
+      isClosable: true,
+      position: 'top-right',
+    })
   }
 
   return (
@@ -71,17 +112,18 @@ const Register = () => {
         
         <AuthForm
           onSubmit={handleRegister}
-          submitButtonText="Sign up"
+          submitButtonText={isSubmitting ? "جاري التسجيل..." : "إنشاء حساب"}
+          isSubmitting={isSubmitting}
           formFieldsContent={
             <MotionVStack spacing={4} width="100%" variants={staggerItem}>
-              <HStack spacing={5} width="full">
-                <FormControl id="lastName" isRequired>
-                  <FormLabel srOnly>Last Name</FormLabel>
+              <HStack spacing={4} width="full">
+                <FormControl id="last_name" isRequired>
+                  <FormLabel srOnly>الاسم الأخير</FormLabel>
                   <Input
-                    type="text"
-                    placeholder="Last Name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    name="last_name"
+                    placeholder="الاسم الأخير"
+                    value={formData.last_name}
+                    onChange={handleChange}
                     bg="white"
                     borderRadius="full"
                     boxShadow="sm"
@@ -91,7 +133,7 @@ const Register = () => {
                     border="1px solid"
                     borderColor="gray.200"
                     textAlign="left"
-                    name="lastName"
+                    isDisabled={isSubmitting}
                     _focus={{
                       borderColor: 'blue.400',
                       boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
@@ -101,14 +143,13 @@ const Register = () => {
                     }}
                   />
                 </FormControl>
-
-                <FormControl id="firstName" isRequired>
-                  <FormLabel srOnly>First Name</FormLabel>
+                <FormControl id="first_name" isRequired>
+                  <FormLabel srOnly>الاسم الأول</FormLabel>
                   <Input
-                    type="text"
-                    placeholder="First name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    name="first_name"
+                    placeholder="الاسم الأول"
+                    value={formData.first_name}
+                    onChange={handleChange}
                     bg="white"
                     borderRadius="full"
                     boxShadow="sm"
@@ -118,7 +159,7 @@ const Register = () => {
                     border="1px solid"
                     borderColor="gray.200"
                     textAlign="left"
-                    name="firstName"
+                    isDisabled={isSubmitting}
                     _focus={{
                       borderColor: 'blue.400',
                       boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
@@ -130,13 +171,13 @@ const Register = () => {
                 </FormControl>
               </HStack>
 
-              <FormControl id="jobTitle" isRequired>
-                <FormLabel srOnly>Job title</FormLabel>
+              <FormControl id="username" isRequired>
+                <FormLabel srOnly>اسم المستخدم</FormLabel>
                 <Input
-                  type="text"
-                  placeholder="Job title"
-                  value={jobTitle}
-                  onChange={(e) => setJobTitle(e.target.value)}
+                  name="username"
+                  placeholder="اسم المستخدم"
+                  value={formData.username}
+                  onChange={handleChange}
                   bg="white"
                   borderRadius="full"
                   boxShadow="sm"
@@ -145,7 +186,7 @@ const Register = () => {
                   border="1px solid"
                   borderColor="gray.200"
                   textAlign="left"
-                  name="jobTitle"
+                  isDisabled={isSubmitting}
                   _focus={{
                     borderColor: 'blue.400',
                     boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
@@ -157,12 +198,13 @@ const Register = () => {
               </FormControl>
 
               <FormControl id="email" isRequired>
-                <FormLabel srOnly>E-mail</FormLabel>
+                <FormLabel srOnly>البريد الإلكتروني</FormLabel>
                 <Input
                   type="email"
-                  placeholder="E-mail"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  placeholder="البريد الإلكتروني"
+                  value={formData.email}
+                  onChange={handleChange}
                   bg="white"
                   borderRadius="full"
                   boxShadow="sm"
@@ -171,7 +213,7 @@ const Register = () => {
                   border="1px solid"
                   borderColor="gray.200"
                   textAlign="left"
-                  name="email"
+                  isDisabled={isSubmitting}
                   _focus={{
                     borderColor: 'blue.400',
                     boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
@@ -181,14 +223,15 @@ const Register = () => {
                   }}
                 />
               </FormControl>
-
+              
               <FormControl id="password" isRequired>
-                <FormLabel srOnly>Password</FormLabel>
+                <FormLabel srOnly>كلمة المرور</FormLabel>
                 <Input
                   type="password"
-                  placeholder="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  placeholder="كلمة المرور"
+                  value={formData.password}
+                  onChange={handleChange}
                   bg="white"
                   borderRadius="full"
                   boxShadow="sm"
@@ -197,7 +240,7 @@ const Register = () => {
                   border="1px solid"
                   borderColor="gray.200"
                   textAlign="left"
-                  name="password"
+                  isDisabled={isSubmitting}
                   _focus={{
                     borderColor: 'blue.400',
                     boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
@@ -209,10 +252,10 @@ const Register = () => {
               </FormControl>
 
               <FormControl id="confirmPassword" isRequired>
-                <FormLabel srOnly>Confirm Password</FormLabel>
+                <FormLabel srOnly>تأكيد كلمة المرور</FormLabel>
                 <Input
                   type="password"
-                  placeholder="Confirm Password"
+                  placeholder="تأكيد كلمة المرور"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   bg="white"
@@ -223,7 +266,7 @@ const Register = () => {
                   border="1px solid"
                   borderColor="gray.200"
                   textAlign="left"
-                  name="confirmPassword"
+                  isDisabled={isSubmitting}
                   _focus={{
                     borderColor: 'blue.400',
                     boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',

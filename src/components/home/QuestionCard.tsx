@@ -1,64 +1,68 @@
-import { Box, Flex, Avatar, IconButton, HStack, Spacer, Text } from '@chakra-ui/react';
-import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons';
-import { FaCommentDots, FaEllipsisV } from "react-icons/fa";
+import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer } from '@chakra-ui/react';
+import { UpDownIcon } from '@chakra-ui/icons';
+import { FiArrowUp, FiArrowDown, FiMessageCircle } from 'react-icons/fi';
 
-const QuestionCard = () => {
+// Assuming a User type similar to what's in AuthContext
+// This could be imported from a shared types file in a larger app
+type User = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  avatar?: string;
+  job?: string;
+};
+
+type QuestionCardProps = {
+  question: {
+    id: number;
+    user: User;
+    content: string; // Updated from 'text' to 'content' to match API
+    upvotes: number;
+    downvotes: number;
+    answers_count: number; // Updated from 'commentsCount' to 'answers_count'
+    created_at: string; // Updated from 'time' to 'created_at'
+  };
+};
+
+const QuestionCard = ({ question }: QuestionCardProps) => {
   return (
-    <Box mt="16px" p="16px" bg="white" borderRadius="lg" boxShadow="md" maxW="600px" mx="auto" mb="16px">
-      <HStack>
-          <Avatar w="40px" h="40px" name="Medhat Mohamed" src="/images/medhat.png" />
-          <Box>
-              <Text fontSize="16px" fontWeight="bold">Medhat Mohamed</Text>
-              <Text fontSize="12px" color="gray.500" fontWeight="light">Software Developer</Text>
-          </Box>
-          <Spacer />
-          <IconButton
-              aria-label="Options"
-              icon={<Box as={FaEllipsisV} boxSize="20px" />}
-              variant="ghost"
-              isRound={true}
-          />
-      </HStack>
-      <Text fontSize="16px" mt="12px">What Android version is now available in your phone?</Text>
+    <Box bg="white" borderRadius="lg" boxShadow="md" p={4} mb={6}>
+      <Flex align="center" mb={3}>
+        <Avatar name={`${question.user.first_name} ${question.user.last_name}`} src={question.user.avatar} mr={3} />
+        <Box>
+          <Text fontWeight="bold" fontSize="md">{`${question.user.first_name} ${question.user.last_name}`}</Text>
+          <Text fontSize="sm" color="gray.500">{question.user.job || 'No job title'}</Text>
+        </Box>
+        <Spacer />
+        {/* Three dots icon - you might need a custom icon or a Chakra component */}
+        <IconButton
+          aria-label="Options"
+          icon={<Box as={UpDownIcon} transform="rotate(90deg)" />} // A simple placeholder for now
+          variant="ghost"
+          size="sm"
+        />
+      </Flex>
 
-      <HStack mt="12px" spacing="16px">
-          <HStack spacing="4px">
-              <IconButton aria-label="Upvote" icon={<ChevronUpIcon boxSize="20px" />} size="sm" variant="ghost" />
-              <Text fontSize="12px" fontWeight="light">10</Text>
-          </HStack>
-          <HStack spacing="4px">
-              <IconButton aria-label="Downvote" icon={<ChevronDownIcon boxSize="20px" />} size="sm" variant="ghost" />
-              <Text fontSize="12px" fontWeight="light">1</Text>
-          </HStack>
-          <HStack spacing="4px">
-              <IconButton aria-label="Comments" icon={<Box as={FaCommentDots} boxSize="20px" />} size="sm" variant="ghost" />
-              <Text fontSize="12px" fontWeight="light">2</Text>
-          </HStack>
-          <Spacer />
-          <Text fontSize="12px" color="gray.500" fontWeight="light">1 h ago</Text>
-      </HStack>
-
-      {/* Answer box */}
-      <Box mt="12px" p="12px" bg="#f9f9f9" borderRadius="md">
-          <HStack>
-              <Avatar size="xs" name="Rose Ben" src="/images/rose.png" />
-              <Box>
-                  <Text fontSize="14px" fontWeight="bold">Rose Ben</Text>
-                  <Text fontSize="12px" color="gray.500" fontWeight="light">Software Developer</Text>
-              </Box>
-          </HStack>
-          <Text fontSize="14px" mt="8px">Lorem ipsum dolor sit amet, consectetur adipiscing elit donec consectetur semper nunc in molestie.</Text>
-          <HStack mt="8px" spacing="16px">
-              <HStack spacing="4px">
-                  <IconButton aria-label="Upvote Answer" icon={<ChevronUpIcon boxSize="20px" />} size="xs" variant="ghost" />
-                  <Text fontSize="12px" fontWeight="light">5</Text>
-              </HStack>
-              <HStack spacing="4px">
-                  <IconButton aria-label="Downvote Answer" icon={<ChevronDownIcon boxSize="20px" />} size="xs" variant="ghost" />
-                  <Text fontSize="12px" fontWeight="light"></Text>
-              </HStack>
-          </HStack>
+      <Box mb={4}>
+        <Text fontSize="lg" fontWeight="medium" mb={2}>{question.content}</Text>
       </Box>
+
+      <Flex align="center" fontSize="sm" color="gray.600">
+        <HStack spacing={1} mr={4}>
+          <IconButton aria-label="Upvote" icon={<FiArrowUp />} variant="ghost" size="sm" />
+          <Text>{question.upvotes}</Text>
+        </HStack>
+        <HStack spacing={1} mr={4}>
+          <IconButton aria-label="Downvote" icon={<FiArrowDown />} variant="ghost" size="sm" />
+          <Text>{question.downvotes}</Text>
+        </HStack>
+        <HStack spacing={1}>
+          <IconButton aria-label="Comments" icon={<FiMessageCircle />} variant="ghost" size="sm" />
+          <Text>{question.answers_count}</Text>
+        </HStack>
+        <Spacer />
+        <Text color="gray.500">{new Date(question.created_at).toLocaleString()}</Text>
+      </Flex>
     </Box>
   );
 };
