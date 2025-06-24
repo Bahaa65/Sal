@@ -44,4 +44,10 @@ export const voteQuestion = (questionId: number, vote: 0 | 1 | 2) =>
 export const voteAnswer = (answerId: number, vote: 0 | 1 | 2) =>
   apiClient.post(`/answers/${answerId}/vote`, { vote });
 
+export const deleteQuestion = (questionId: number) =>
+  apiClient.delete(`/questions/${questionId}`);
+
+export const deleteAnswer = (answerId: number) =>
+  apiClient.delete(`/answers/${answerId}`);
+
 export default apiClient; 

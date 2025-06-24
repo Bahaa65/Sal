@@ -16,6 +16,13 @@ import {
   MenuItem,
   Icon,
   Input,
+  useToast,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
 import {
   FiArrowUp,
@@ -25,15 +32,17 @@ import {
   FiMoreVertical,
   FiUser,
   FiX,
+  FiTrash2,
 } from "react-icons/fi";
 import AnswerModal from "./AnswerModal";
 import { useQuery } from "@tanstack/react-query";
-import apiClient from "../../services/apiClient";
+import apiClient, { deleteQuestion } from "../../services/apiClient";
 import AnswerCard from "./AnswerCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { voteQuestion } from '../../services/apiClient';
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../contexts/AuthContext";
 
 // Assuming a User type similar to what's in AuthContext
 // This could be imported from a shared types file in a larger app
@@ -85,6 +94,19 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
   const [votes, setVotes] = useState({ upvotes: question.upvotes, downvotes: question.downvotes });
   const [userVote, setUserVote] = useState<boolean | null>(question.viewer_vote || null);
   const queryClient = useQueryClient();
+  const toast = useToast();
+  const auth = useAuth();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Check if current user is the question owner
+  const isQuestionOwner = auth.user?.id === question.user.id;
+  
+  // Debug logging
+  console.log('Current user:', auth.user);
+  console.log('Current user ID:', auth.user?.id);
+  console.log('Question user ID:', question.user.id);
+  console.log('Is question owner:', isQuestionOwner);
 
   // Update votes when question data changes
   useEffect(() => {
@@ -170,6 +192,33 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteQuestion(question.id);
+      toast({
+        title: "Question deleted successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      // Invalidate questions query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['questions'] });
+      // Hide the question card
+      setHidden(true);
+      setIsDeleteDialogOpen(false);
+    } catch (e) {
+      console.error('Error deleting question:', e);
+      toast({
+        title: "Error deleting question",
+        description: "An error occurred while deleting the question",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
   if (hidden) return null;
 
   return (
@@ -190,6 +239,15 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
               </MenuItem>
               <MenuItem icon={<Icon as={FiUser} />} onClick={handleViewProfile}>
                 View Publisher Profile
+              </MenuItem>
+              {isQuestionOwner && (
+                <MenuItem icon={<Icon as={FiTrash2} />} onClick={() => setIsDeleteDialogOpen(true)}>
+                  Delete Question
+                </MenuItem>
+              )}
+              {/* Temporary: Always show delete option for debugging */}
+              <MenuItem icon={<Icon as={FiTrash2} />} onClick={() => setIsDeleteDialogOpen(true)}>
+                Delete Question (Debug)
               </MenuItem>
             </MenuList>
           </Menu>
@@ -282,6 +340,33 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
         </Collapse>
       </Box>
       <AnswerModal isOpen={isModalOpen} onClose={onClose} questionId={question.id} />
+      <AlertDialog
+        isOpen={isDeleteDialogOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsDeleteDialogOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader>Confirm Deletion</AlertDialogHeader>
+            <AlertDialogBody>
+              Are you sure you want to delete this question? This action cannot be undone.
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setIsDeleteDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={handleDelete}
+                isLoading={isLoadingAnswers}
+                ml={3}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </>
   );
 };

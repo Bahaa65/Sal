@@ -1,9 +1,10 @@
-import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer, Menu, MenuButton, MenuList, MenuItem, Icon } from '@chakra-ui/react';
-import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX } from 'react-icons/fi';
+import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer, Menu, MenuButton, MenuList, MenuItem, Icon, useToast, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button } from '@chakra-ui/react';
+import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX, FiTrash2 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { voteAnswer } from '../../services/apiClient';
+import { useState, useEffect, useRef } from 'react';
+import { voteAnswer, deleteAnswer } from '../../services/apiClient';
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../contexts/AuthContext";
 
 // This should ideally come from a shared types file
 type User = {
@@ -37,6 +38,19 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
   const [votes, setVotes] = useState({ upvotes: answer.upvotes, downvotes: answer.downvotes });
   const [userVote, setUserVote] = useState<boolean | null>(answer.viewer_vote || null);
   const queryClient = useQueryClient();
+  const toast = useToast();
+  const auth = useAuth();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Check if current user is the answer owner
+  const isAnswerOwner = auth.user?.id === answer.user.id;
+  
+  // Debug logging
+  console.log('Current user:', auth.user);
+  console.log('Current user ID:', auth.user?.id);
+  console.log('Answer user ID:', answer.user.id);
+  console.log('Is answer owner:', isAnswerOwner);
 
   // Update votes when answer data changes
   useEffect(() => {
@@ -90,6 +104,32 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteAnswer(answer.id);
+      toast({
+        title: "Answer deleted",
+        description: "The answer has been successfully deleted.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      queryClient.invalidateQueries({ queryKey: ["answers"] });
+      setHidden(true);
+      setIsDeleteDialogOpen(false);
+    } catch (e) {
+      console.error('Delete error:', e);
+      toast({
+        title: "Error",
+        description: "An error occurred while deleting the answer.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
   if (hidden) return null;
 
   return (
@@ -109,6 +149,15 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
             </MenuItem>
             <MenuItem icon={<Icon as={FiUser} />} onClick={handleViewProfile}>
               View Publisher Profile
+            </MenuItem>
+            {isAnswerOwner && (
+              <MenuItem icon={<Icon as={FiTrash2} />} onClick={() => setIsDeleteDialogOpen(true)}>
+                Delete Answer
+              </MenuItem>
+            )}
+            {/* Temporary: Always show delete option for debugging */}
+            <MenuItem icon={<Icon as={FiTrash2} />} onClick={() => setIsDeleteDialogOpen(true)}>
+              Delete Answer
             </MenuItem>
           </MenuList>
         </Menu>
@@ -153,6 +202,29 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
         <Spacer />
         <Text fontSize="xs" color="gray.500">{new Date(answer.created_at).toLocaleString()}</Text>
       </Flex>
+
+      <AlertDialog
+        isOpen={isDeleteDialogOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setIsDeleteDialogOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader>Confirm Deletion</AlertDialogHeader>
+            <AlertDialogBody>
+              Are you sure you want to delete this answer? This action cannot be undone.
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setIsDeleteDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button colorScheme="red" onClick={handleDelete} ml={3}>
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 };
