@@ -18,6 +18,7 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 import apiClient from "../../services/apiClient";
+import { CloseIcon } from "@chakra-ui/icons";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -71,6 +72,8 @@ const EditProfileModal = ({ isOpen, onClose, user, onProfileUpdated }: EditProfi
         } catch {
           payload.avatar = avatar;
         }
+      } else {
+        payload.avatar = "";
       }
       const { data } = await apiClient.patch("/profile", payload);
       toast({ title: "Profile updated successfully.", status: "success" });
@@ -95,8 +98,27 @@ const EditProfileModal = ({ isOpen, onClose, user, onProfileUpdated }: EditProfi
         <ModalCloseButton />
         <ModalBody>
           <VStack spacing={4} align="stretch">
-            <Flex align="center" direction="column">
-              <Avatar size="xl" src={avatar} mb={2} />
+            <Flex align="center" direction="column" position="relative">
+              <Box position="relative" mb={2}>
+                <Avatar size="xl" src={avatar} name={firstName + ' ' + lastName} />
+                {avatar && (
+                  <Button
+                    size="xs"
+                    position="absolute"
+                    top="-8px"
+                    right="-8px"
+                    colorScheme="red"
+                    borderRadius="full"
+                    onClick={() => setAvatar("")}
+                    zIndex={2}
+                    p={0}
+                    minW="24px"
+                    h="24px"
+                  >
+                    <CloseIcon boxSize={3} />
+                  </Button>
+                )}
+              </Box>
               <Button as="label" htmlFor="avatar-upload" variant="outline" size="sm" isLoading={isSaving}>
                 Change Photo
                 <input

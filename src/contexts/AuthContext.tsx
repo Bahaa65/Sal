@@ -49,13 +49,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { data } = await apiClient.get('/profile');
       if (data && data.success) {
         setUser(data.data);
+        localStorage.setItem('user', JSON.stringify(data.data));
       } else {
         throw new Error('Failed to fetch user profile');
       }
     } catch (error) {
       console.error('Failed to fetch user', error);
       setUser(null);
-      localStorage.removeItem('token');
     }
   }, []);
 
@@ -69,6 +69,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [fetchUser]);
   
   useEffect(() => {
+    // On app load, initialize user from localStorage if available
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (token && userData) {
+      setUser(JSON.parse(userData));
+    }
     checkAuthStatus();
   }, [checkAuthStatus]);
   
@@ -80,6 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setUser(null);
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
   }, []);
   
@@ -118,7 +125,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { data } = await apiClient.post('/register', userData);
        if (data && data.success && data.token) {
         localStorage.setItem('token', data.token);
-        // After registering, we need to fetch the newly created user's profile
         await fetchUser();
       } else {
         throw new Error('Registration failed: No token received');

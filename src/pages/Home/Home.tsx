@@ -113,7 +113,7 @@ const Home = () => {
             <Text fontSize="lg" color="gray.500">
               {searchTerm ? 'No questions found matching your search.' : 'No questions available.'}
             </Text>
-          </Box>
+        </Box>
         )}
 
         {sortedQuestions && sortedQuestions.map((q: any) => (
@@ -131,4 +131,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Home; 

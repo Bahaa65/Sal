@@ -13,6 +13,8 @@ import {
 import apiClient from "../../services/apiClient";
 import MainLayout from '../../components/home/MainLayout';
 import EditProfileModal from './EditProfileModal';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const { username } = useParams();
@@ -21,6 +23,8 @@ const Profile = () => {
   const [questions, setQuestions] = useState<any[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -59,6 +63,25 @@ const Profile = () => {
     if (user?.username) fetchQuestions();
   }, [user?.username]);
 
+  const refetchProfile = async () => {
+    setLoading(true);
+    try {
+      let data;
+      if (username) {
+        const res = await apiClient.get(`/users/${username}`);
+        data = res.data.data;
+      } else {
+        const res = await apiClient.get("/profile");
+        data = res.data.data;
+      }
+      setUser(data);
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <MainLayout>
@@ -84,6 +107,11 @@ const Profile = () => {
           <Text color="gray.500" mt={2}>{user.bio}</Text>
           {!username && (
             <Button mt={4} colorScheme="blue" onClick={onOpen}>Edit Profile</Button>
+          )}
+          {!username && (
+            <Button mt={2} colorScheme="red" variant="outline" onClick={() => { logout(); navigate('/login'); }}>
+             Logout
+            </Button>
           )}
           {username && (
             <Box mt={2} mb={2} px={3} py={1} bg="gray.100" borderRadius="full" fontSize="sm" color="gray.600">
@@ -112,7 +140,10 @@ const Profile = () => {
         {!username && (
           <EditProfileModal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={() => {
+              onClose();
+              refetchProfile();
+            }}
             user={user}
             onProfileUpdated={setUser}
           />

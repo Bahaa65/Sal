@@ -69,7 +69,6 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
     try {
       // Optimistic update - update UI immediately
       const optimisticVotes = { ...votes };
-      const optimisticUserVote = userVote;
 
       // If user already voted the same way, remove the vote (vote: 0)
       if ((vote === 1 && userVote === true) || (vote === 2 && userVote === false)) {
