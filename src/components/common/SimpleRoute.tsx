@@ -7,7 +7,7 @@ interface SimpleRouteProps {
 }
 
 const SimpleRoute: React.FC<SimpleRouteProps> = ({ children, requireAuth = false }) => {
-  // للاختبار فقط - يمكن إزالة هذا لاحقاً
+  // For testing only - can be removed later
   const isAuthenticated = localStorage.getItem('token') !== null;
 
   if (requireAuth && !isAuthenticated) {

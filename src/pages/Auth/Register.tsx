@@ -33,8 +33,8 @@ const Register = () => {
   const handleRegister = async () => {
     if (Object.values(formData).some(value => value === '')) {
       toast({
-        title: 'خطأ في البيانات',
-        description: 'يرجى تعبئة جميع الحقول المطلوبة',
+        title: 'Invalid Data',
+        description: 'Please fill in all required fields',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -45,8 +45,8 @@ const Register = () => {
 
     if (formData.password !== confirmPassword) {
       toast({
-        title: 'خطأ',
-        description: 'كلمتا المرور غير متطابقتين.',
+        title: 'Error',
+        description: 'Passwords do not match.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -60,8 +60,8 @@ const Register = () => {
       await register(formData)
       
       toast({
-        title: 'تسجيل ناجح',
-        description: `مرحباً بك يا ${formData.first_name}! تم تسجيل حسابك بنجاح.`,
+        title: 'Registration Successful',
+        description: `Welcome, ${formData.first_name}! Your account has been created successfully.`,
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -73,8 +73,8 @@ const Register = () => {
       console.error('Registration error:', error)
       
       toast({
-        title: 'خطأ في التسجيل',
-        description: error.message || 'حدث خطأ أثناء إنشاء الحساب',
+        title: 'Registration Error',
+        description: error.message || 'An error occurred while creating the account',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -88,8 +88,8 @@ const Register = () => {
   const handleGithubLogin = () => {
     console.log('GitHub login clicked')
     toast({
-      title: 'قريباً',
-      description: 'سيتم إضافة تسجيل الدخول بـ GitHub قريباً',
+      title: 'Coming Soon',
+      description: 'GitHub login will be added soon',
       status: 'info',
       duration: 3000,
       isClosable: true,
@@ -112,16 +112,16 @@ const Register = () => {
         
         <AuthForm
           onSubmit={handleRegister}
-          submitButtonText={isSubmitting ? "جاري التسجيل..." : "إنشاء حساب"}
+          submitButtonText={isSubmitting ? "Registering..." : "Register"}
           isSubmitting={isSubmitting}
           formFieldsContent={
             <MotionVStack spacing={4} width="100%" variants={staggerItem}>
               <HStack spacing={4} width="full">
                 <FormControl id="last_name" isRequired>
-                  <FormLabel srOnly>الاسم الأخير</FormLabel>
+                  <FormLabel srOnly>Last Name</FormLabel>
                   <Input
                     name="last_name"
-                    placeholder="الاسم الأخير"
+                    placeholder="Last Name"
                     value={formData.last_name}
                     onChange={handleChange}
                     bg="white"
@@ -144,10 +144,10 @@ const Register = () => {
                   />
                 </FormControl>
                 <FormControl id="first_name" isRequired>
-                  <FormLabel srOnly>الاسم الأول</FormLabel>
+                  <FormLabel srOnly>First Name</FormLabel>
                   <Input
                     name="first_name"
-                    placeholder="الاسم الأول"
+                    placeholder="First Name"
                     value={formData.first_name}
                     onChange={handleChange}
                     bg="white"
@@ -172,10 +172,10 @@ const Register = () => {
               </HStack>
 
               <FormControl id="username" isRequired>
-                <FormLabel srOnly>اسم المستخدم</FormLabel>
+                <FormLabel srOnly>Username</FormLabel>
                 <Input
                   name="username"
-                  placeholder="اسم المستخدم"
+                  placeholder="Username"
                   value={formData.username}
                   onChange={handleChange}
                   bg="white"
@@ -198,11 +198,11 @@ const Register = () => {
               </FormControl>
 
               <FormControl id="email" isRequired>
-                <FormLabel srOnly>البريد الإلكتروني</FormLabel>
+                <FormLabel srOnly>Email</FormLabel>
                 <Input
                   type="email"
                   name="email"
-                  placeholder="البريد الإلكتروني"
+                  placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
                   bg="white"
@@ -225,11 +225,11 @@ const Register = () => {
               </FormControl>
 
               <FormControl id="password" isRequired>
-                <FormLabel srOnly>كلمة المرور</FormLabel>
+                <FormLabel srOnly>Password</FormLabel>
                 <Input
                   type="password"
                   name="password"
-                  placeholder="كلمة المرور"
+                  placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
                   bg="white"
@@ -252,10 +252,10 @@ const Register = () => {
               </FormControl>
 
               <FormControl id="confirmPassword" isRequired>
-                <FormLabel srOnly>تأكيد كلمة المرور</FormLabel>
+                <FormLabel srOnly>Confirm Password</FormLabel>
                 <Input
                   type="password"
-                  placeholder="تأكيد كلمة المرور"
+                  placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   bg="white"

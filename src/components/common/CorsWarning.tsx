@@ -10,17 +10,17 @@ const CorsWarning: React.FC<CorsWarningProps> = ({ onEnableProxy }) => {
     <Alert status="warning" borderRadius="md" mb={4}>
       <AlertIcon />
       <VStack align="start" spacing={2} flex={1}>
-        <AlertTitle>مشكلة في الاتصال بالخادم</AlertTitle>
+        <AlertTitle>Server Connection Issue</AlertTitle>
         <AlertDescription>
-          يبدو أن هناك مشكلة في CORS. يمكنك تجربة أحد الحلول التالية:
+          There seems to be a CORS issue. You can try one of the following solutions:
         </AlertDescription>
         <VStack align="start" spacing={1} fontSize="sm">
-          <Text>1. استخدام CORS Proxy للتطوير</Text>
-          <Text>2. التأكد من أن الخادم يدعم CORS</Text>
-          <Text>3. استخدام متصفح مختلف</Text>
+          <Text>1. Use a CORS Proxy for development</Text>
+          <Text>2. Make sure the server supports CORS</Text>
+          <Text>3. Try a different browser</Text>
         </VStack>
         <Button size="sm" colorScheme="blue" onClick={onEnableProxy}>
-          تفعيل CORS Proxy
+          Enable CORS Proxy
         </Button>
       </VStack>
     </Alert>

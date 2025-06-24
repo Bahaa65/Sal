@@ -38,4 +38,10 @@ apiClient.interceptors.response.use(
   }
 );
 
+export const voteQuestion = (questionId: number, vote: 0 | 1 | 2) =>
+  apiClient.post(`/questions/${questionId}/vote`, { vote });
+
+export const voteAnswer = (answerId: number, vote: 0 | 1 | 2) =>
+  apiClient.post(`/answers/${answerId}/vote`, { vote });
+
 export default apiClient; 

@@ -54,12 +54,12 @@ const AnswerModal = ({ isOpen, onClose, questionId }: AnswerModalProps) => {
             : `${import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000'}/uploads/${data.path}`;
           uploaded.push(url);
         } catch (error) {
-          toast({ title: `فشل رفع صورة: ${file.name}`, status: "error" });
+          toast({ title: `Failed to upload image: ${file.name}`, status: "error" });
         }
       }
       setImages((prev) => [...prev, ...uploaded]);
       setIsUploading(false);
-      if (uploaded.length > 0) toast({ title: "تم رفع الصور بنجاح.", status: "success" });
+      if (uploaded.length > 0) toast({ title: "Images uploaded successfully.", status: "success" });
     }
   };
 

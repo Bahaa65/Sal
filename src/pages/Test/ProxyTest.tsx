@@ -19,7 +19,7 @@ const ProxyTest: React.FC = () => {
 
   const testProxyQuestions = async () => {
     try {
-      addTestResult('Proxy Questions', false, 'جاري الاختبار...');
+      addTestResult('Proxy Questions', false, 'Testing...');
       
       const response = await fetch('/api/questions/', {
         method: 'GET',
@@ -31,18 +31,18 @@ const ProxyTest: React.FC = () => {
       const data = await response.json();
       
       if (response.ok) {
-        addTestResult('Proxy Questions', true, `نجح! Status: ${response.status}`, data);
+        addTestResult('Proxy Questions', true, `Success! Status: ${response.status}`, data);
       } else {
-        addTestResult('Proxy Questions', false, `فشل! Status: ${response.status} ${response.statusText}`, data);
+        addTestResult('Proxy Questions', false, `Failed! Status: ${response.status} ${response.statusText}`, data);
       }
     } catch (error: any) {
-      addTestResult('Proxy Questions', false, `خطأ: ${error.message}`, error);
+      addTestResult('Proxy Questions', false, `Error: ${error.message}`, error);
     }
   };
 
   const testDirectQuestions = async () => {
     try {
-      addTestResult('Direct Questions', false, 'جاري الاختبار...');
+      addTestResult('Direct Questions', false, 'Testing...');
       
       const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/questions/', {
         method: 'GET',
@@ -54,18 +54,18 @@ const ProxyTest: React.FC = () => {
       const data = await response.json();
       
       if (response.ok) {
-        addTestResult('Direct Questions', true, `نجح! Status: ${response.status}`, data);
+        addTestResult('Direct Questions', true, `Success! Status: ${response.status}`, data);
       } else {
-        addTestResult('Direct Questions', false, `فشل! Status: ${response.status} ${response.statusText}`, data);
+        addTestResult('Direct Questions', false, `Failed! Status: ${response.status} ${response.statusText}`, data);
       }
     } catch (error: any) {
-      addTestResult('Direct Questions', false, `خطأ: ${error.message}`, error);
+      addTestResult('Direct Questions', false, `Error: ${error.message}`, error);
     }
   };
 
   const testProxyLogin = async () => {
     try {
-      addTestResult('Proxy Login', false, 'جاري الاختبار...');
+      addTestResult('Proxy Login', false, 'Testing...');
       
       const response = await fetch('/api/auth/login/', {
         method: 'POST',
@@ -81,13 +81,13 @@ const ProxyTest: React.FC = () => {
       const data = await response.json();
       addTestResult('Proxy Login', response.ok, `Status: ${response.status} ${response.statusText}`, data);
     } catch (error: any) {
-      addTestResult('Proxy Login', false, `خطأ: ${error.message}`, error);
+      addTestResult('Proxy Login', false, `Error: ${error.message}`, error);
     }
   };
 
   const testDirectLogin = async () => {
     try {
-      addTestResult('Direct Login', false, 'جاري الاختبار...');
+      addTestResult('Direct Login', false, 'Testing...');
       
       const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/auth/login/', {
         method: 'POST',
@@ -103,7 +103,7 @@ const ProxyTest: React.FC = () => {
       const data = await response.json();
       addTestResult('Direct Login', response.ok, `Status: ${response.status} ${response.statusText}`, data);
     } catch (error: any) {
-      addTestResult('Direct Login', false, `خطأ: ${error.message}`, error);
+      addTestResult('Direct Login', false, `Error: ${error.message}`, error);
     }
   };
 
@@ -120,34 +120,34 @@ const ProxyTest: React.FC = () => {
       <Container maxW="container.lg">
         <VStack spacing={6} align="stretch">
           <Heading textAlign="center" color="blue.600">
-            اختبار الـ Proxy
+            Proxy Test
           </Heading>
           
           <VStack spacing={4}>
             <Button colorScheme="blue" onClick={runAllTests} width="full" size="lg">
-              تشغيل جميع الاختبارات
+              Run All Tests
             </Button>
             
             <Button colorScheme="green" onClick={clearResults} width="full">
-              مسح النتائج
+              Clear Results
             </Button>
           </VStack>
 
           <VStack spacing={4}>
             <Button colorScheme="teal" onClick={testDirectQuestions} width="full">
-              اختبار الاتصال المباشر للأسئلة
+              Direct Questions Connection Test
             </Button>
             
             <Button colorScheme="purple" onClick={testProxyQuestions} width="full">
-              اختبار الاتصال بالـ Proxy للأسئلة
+              Proxy Questions Connection Test
             </Button>
             
             <Button colorScheme="orange" onClick={testDirectLogin} width="full">
-              اختبار تسجيل الدخول المباشر
+              Direct Login Test
             </Button>
             
             <Button colorScheme="pink" onClick={testProxyLogin} width="full">
-              اختبار تسجيل الدخول بالـ Proxy
+              Proxy Login Test
             </Button>
           </VStack>
 

@@ -1,4 +1,4 @@
-import { FormControl, FormLabel, Input, useToast, VStack, Button, Text } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input, useToast, VStack } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -26,8 +26,8 @@ const Login = () => {
 
     if (!currentUsername || !currentPassword) {
       toast({
-        title: 'خطأ في البيانات',
-        description: 'يرجى إدخال اسم المستخدم وكلمة المرور',
+        title: 'Invalid Data',
+        description: 'Please enter your username and password',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -41,23 +41,23 @@ const Login = () => {
       await login(currentUsername, currentPassword)
       
       toast({
-        title: 'تسجيل دخول ناجح',
-        description: 'تم تسجيل دخولك بنجاح.',
+        title: 'Login Successful',
+        description: 'You have logged in successfully.',
         status: 'success',
         duration: 3000,
         isClosable: true,
         position: 'top-right',
       })
 
-      // التوجيه إلى الصفحة المطلوبة أو الصفحة الرئيسية
+      // Redirect to the requested page or home
       const from = location.state?.from?.pathname || '/home'
       navigate(from, { replace: true })
     } catch (error: any) {
       console.error('Login error:', error)
       
       toast({
-        title: 'خطأ في تسجيل الدخول',
-        description: error.message || 'حدث خطأ أثناء تسجيل الدخول',
+        title: 'Login Error',
+        description: error.message || 'An error occurred during login',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -71,8 +71,8 @@ const Login = () => {
   const handleGithubLogin = () => {
     console.log('GitHub login clicked')
     toast({
-      title: 'قريباً',
-      description: 'سيتم إضافة تسجيل الدخول بـ GitHub قريباً',
+      title: 'Coming Soon',
+      description: 'GitHub login will be added soon',
       status: 'info',
       duration: 3000,
       isClosable: true,
@@ -95,15 +95,15 @@ const Login = () => {
         
         <AuthForm
           onSubmit={handleLogin}
-          submitButtonText={isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+          submitButtonText={isSubmitting ? "Logging in..." : "Login"}
           isSubmitting={isSubmitting}
           formFieldsContent={
             <MotionVStack spacing={4} width="100%" variants={staggerItem}>
               <FormControl id="username" isRequired>
-                <FormLabel srOnly>اسم المستخدم</FormLabel>
+                <FormLabel srOnly>Username</FormLabel>
                 <Input
                   type="text"
-                  placeholder="اسم المستخدم"
+                  placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   bg="white"
@@ -127,10 +127,10 @@ const Login = () => {
               </FormControl>
 
               <FormControl id="password" isRequired>
-                <FormLabel srOnly>كلمة المرور</FormLabel>
+                <FormLabel srOnly>Password</FormLabel>
                 <Input
                   type="password"
-                  placeholder="كلمة المرور"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   bg="white"

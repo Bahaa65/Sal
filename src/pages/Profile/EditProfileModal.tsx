@@ -38,7 +38,6 @@ const EditProfileModal = ({ isOpen, onClose, user, onProfileUpdated }: EditProfi
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      // رفع الصورة مباشرة
       const formData = new FormData();
       formData.append("file", file);
       try {
@@ -65,7 +64,6 @@ const EditProfileModal = ({ isOpen, onClose, user, onProfileUpdated }: EditProfi
       if (job) payload.job = job;
       if (bio) payload.bio = bio;
       if (avatar) {
-        // إذا كان avatar رابط كامل، أرسل فقط اسم الملف
         try {
           const url = new URL(avatar);
           const parts = url.pathname.split('/');

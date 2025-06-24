@@ -106,7 +106,7 @@ const ConnectionTest: React.FC = () => {
             colorScheme="blue" 
             onClick={testConnection}
             isLoading={isTesting}
-            loadingText="جاري الاختبار..."
+            loadingText="Testing..."
           >
             Test direct connection
           </Button>
@@ -115,7 +115,7 @@ const ConnectionTest: React.FC = () => {
             colorScheme="green" 
             onClick={testWithProxy}
             isLoading={isTesting}
-            loadingText="جاري الاختبار..."
+            loadingText="Testing..."
           >
             Test Proxy connection
           </Button>

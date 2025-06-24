@@ -11,7 +11,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // عرض spinner أثناء التحقق من المصادقة
+  // Show spinner while checking authentication
   if (isLoading) {
     return (
       <Center h="100vh">
@@ -20,12 +20,12 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
     );
   }
 
-  // إذا لم يكن المستخدم مسجل الدخول، توجيه إلى صفحة تسجيل الدخول
+  // If the user is not authenticated, redirect to the login page
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // إذا كان مسجل الدخول، عرض المحتوى المطلوب
+  // If authenticated, render the requested content
   return <>{children}</>;
 };
 

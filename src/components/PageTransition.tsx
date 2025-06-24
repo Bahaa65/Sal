@@ -45,8 +45,8 @@ export const NotificationsList = () => {
   return (
     <Box>
       <Flex align="center" mb={4}>
-        <Text fontWeight="bold" fontSize="xl">الإشعارات</Text>
-        <Badge colorScheme="red" ml={2}>{data.unread_count} غير مقروءة</Badge>
+        <Text fontWeight="bold" fontSize="xl">Notifications</Text>
+        <Badge colorScheme="red" ml={2}>{data.unread_count} unread</Badge>
       </Flex>
       <List spacing={3}>
         {data.data.map((notif: any) => (
@@ -61,7 +61,7 @@ export const NotificationsList = () => {
             justifyContent="space-between"
           >
             <Box>
-              <Text>{notif.content || notif.text || 'إشعار جديد'}</Text>
+              <Text>{notif.content || notif.text || 'New notification'}</Text>
               <Text fontSize="xs" color="gray.500">{new Date(notif.created_at).toLocaleString()}</Text>
             </Box>
             {!notif.read && (
@@ -70,7 +70,7 @@ export const NotificationsList = () => {
                 colorScheme="blue"
                 onClick={() => mutation.mutate(notif.id)}
               >
-                تعيين كمقروء
+                Mark as read
               </Button>
             )}
           </ListItem>

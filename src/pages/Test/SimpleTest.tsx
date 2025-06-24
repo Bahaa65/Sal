@@ -6,7 +6,7 @@ const SimpleTest: React.FC = () => {
 
   const testDirectConnection = async () => {
     try {
-      setTestResult('جاري اختبار الاتصال المباشر...');
+      setTestResult('Testing direct connection...');
       
       const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/questions/', {
         method: 'GET',
@@ -17,18 +17,18 @@ const SimpleTest: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setTestResult(`نجح الاتصال المباشر! البيانات: ${JSON.stringify(data, null, 2)}`);
+        setTestResult(`Direct connection succeeded! Data: ${JSON.stringify(data, null, 2)}`);
       } else {
-        setTestResult(`فشل الاتصال المباشر: ${response.status} ${response.statusText}`);
+        setTestResult(`Direct connection failed: ${response.status} ${response.statusText}`);
       }
     } catch (error: any) {
-      setTestResult(`خطأ في الاتصال المباشر: ${error.message}`);
+      setTestResult(`Direct connection error: ${error.message}`);
     }
   };
 
   const testProxyConnection = async () => {
     try {
-      setTestResult('جاري اختبار الاتصال بالـ Proxy...');
+      setTestResult('Testing Proxy connection...');
       
       const response = await fetch('/api/questions/', {
         method: 'GET',
@@ -39,18 +39,18 @@ const SimpleTest: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setTestResult(`نجح الاتصال بالـ Proxy! البيانات: ${JSON.stringify(data, null, 2)}`);
+        setTestResult(`Proxy connection succeeded! Data: ${JSON.stringify(data, null, 2)}`);
       } else {
-        setTestResult(`فشل الاتصال بالـ Proxy: ${response.status} ${response.statusText}`);
+        setTestResult(`Proxy connection failed: ${response.status} ${response.statusText}`);
       }
     } catch (error: any) {
-      setTestResult(`خطأ في الاتصال بالـ Proxy: ${error.message}`);
+      setTestResult(`Proxy connection error: ${error.message}`);
     }
   };
 
   const testLogin = async () => {
     try {
-      setTestResult('جاري اختبار تسجيل الدخول...');
+      setTestResult('Testing login...');
       
       const response = await fetch('/api/auth/login/', {
         method: 'POST',
@@ -64,9 +64,9 @@ const SimpleTest: React.FC = () => {
       });
 
       const data = await response.json();
-      setTestResult(`نتيجة تسجيل الدخول: ${response.status} ${response.statusText}\nالبيانات: ${JSON.stringify(data, null, 2)}`);
+      setTestResult(`Login result: ${response.status} ${response.statusText}\nData: ${JSON.stringify(data, null, 2)}`);
     } catch (error: any) {
-      setTestResult(`خطأ في تسجيل الدخول: ${error.message}`);
+      setTestResult(`Login error: ${error.message}`);
     }
   };
 
@@ -75,29 +75,29 @@ const SimpleTest: React.FC = () => {
       <Container maxW="container.md">
         <VStack spacing={6} align="stretch">
           <Heading textAlign="center" color="blue.600">
-            اختبار الاتصال البسيط
+            Simple Connection Test
           </Heading>
           
           <VStack spacing={4}>
             <Button colorScheme="blue" onClick={testDirectConnection} width="full">
-              اختبار الاتصال المباشر
+              Direct Connection Test
             </Button>
             
             <Button colorScheme="green" onClick={testProxyConnection} width="full">
-              اختبار الاتصال بالـ Proxy
+              Proxy Connection Test
             </Button>
             
             <Button colorScheme="purple" onClick={testLogin} width="full">
-              اختبار تسجيل الدخول
+              Login Test
             </Button>
           </VStack>
 
           {testResult && (
-            <Alert status={testResult.includes('نجح') ? 'success' : 'error'}>
+            <Alert status={testResult.includes('succeeded') ? 'success' : 'error'}>
               <AlertIcon />
               <Box>
                 <AlertTitle>
-                  {testResult.includes('نجح') ? 'نجح الاختبار' : 'فشل الاختبار'}
+                  {testResult.includes('succeeded') ? 'Test succeeded' : 'Test failed'}
                 </AlertTitle>
                 <AlertDescription>
                   <Text whiteSpace="pre-wrap" fontSize="sm">

@@ -47,10 +47,10 @@ const ComprehensiveTest: React.FC = () => {
     setTestResults([]);
   };
 
-  // اختبار الاتصال المباشر
+  // Direct connection test
   const testDirectConnection = async () => {
     try {
-      addTestResult('Direct Connection', false, 'جاري الاختبار...');
+      addTestResult('Direct Connection', false, 'Testing...');
       
       const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/questions/', {
         method: 'GET',
@@ -60,19 +60,19 @@ const ComprehensiveTest: React.FC = () => {
       const data = await response.json();
       
       if (response.ok) {
-        addTestResult('Direct Connection', true, `نجح! Status: ${response.status}`, data);
+        addTestResult('Direct Connection', true, `Success! Status: ${response.status}`, data);
       } else {
-        addTestResult('Direct Connection', false, `فشل! Status: ${response.status}`, data);
+        addTestResult('Direct Connection', false, `Failed! Status: ${response.status}`, data);
       }
     } catch (error: any) {
-      addTestResult('Direct Connection', false, `خطأ: ${error.message}`, error);
+      addTestResult('Direct Connection', false, `Error: ${error.message}`, error);
     }
   };
 
-  // اختبار Vite Proxy
+  // Vite Proxy test
   const testViteProxy = async () => {
     try {
-      addTestResult('Vite Proxy', false, 'جاري الاختبار...');
+      addTestResult('Vite Proxy', false, 'Testing...');
       
       const response = await fetch('/api/questions/', {
         method: 'GET',
@@ -82,19 +82,19 @@ const ComprehensiveTest: React.FC = () => {
       const data = await response.json();
       
       if (response.ok) {
-        addTestResult('Vite Proxy', true, `نجح! Status: ${response.status}`, data);
+        addTestResult('Vite Proxy', true, `Success! Status: ${response.status}`, data);
       } else {
-        addTestResult('Vite Proxy', false, `فشل! Status: ${response.status}`, data);
+        addTestResult('Vite Proxy', false, `Failed! Status: ${response.status}`, data);
       }
     } catch (error: any) {
-      addTestResult('Vite Proxy', false, `خطأ: ${error.message}`, error);
+      addTestResult('Vite Proxy', false, `Error: ${error.message}`, error);
     }
   };
 
-  // اختبار تسجيل الدخول
+  // Login test
   const testLogin = async () => {
     try {
-      addTestResult('Login Test', false, 'جاري الاختبار...');
+      addTestResult('Login Test', false, 'Testing...');
       
       const response = await fetch('/api/auth/login/', {
         method: 'POST',
@@ -108,14 +108,14 @@ const ComprehensiveTest: React.FC = () => {
       const data = await response.json();
       addTestResult('Login Test', response.ok, `Status: ${response.status}`, data);
     } catch (error: any) {
-      addTestResult('Login Test', false, `خطأ: ${error.message}`, error);
+      addTestResult('Login Test', false, `Error: ${error.message}`, error);
     }
   };
 
-  // اختبار إنشاء سؤال
+  // Create question test
   const testCreateQuestion = async () => {
     try {
-      addTestResult('Create Question', false, 'جاري الاختبار...');
+      addTestResult('Create Question', false, 'Testing...');
       
       const response = await fetch('/api/questions/', {
         method: 'POST',
@@ -129,7 +129,7 @@ const ComprehensiveTest: React.FC = () => {
       const data = await response.json();
       addTestResult('Create Question', response.ok, `Status: ${response.status}`, data);
     } catch (error: any) {
-      addTestResult('Create Question', false, `خطأ: ${error.message}`, error);
+      addTestResult('Create Question', false, `Error: ${error.message}`, error);
     }
   };
 
@@ -154,23 +154,23 @@ const ComprehensiveTest: React.FC = () => {
       <Container maxW="container.xl">
         <VStack spacing={6} align="stretch">
           <Heading textAlign="center" color="blue.600">
-            اختبار شامل للاتصال
+            Comprehensive Connection Test
           </Heading>
           
           <Alert status="info" borderRadius="md">
             <AlertIcon />
             <Box>
-              <AlertTitle>معلومات الاختبار</AlertTitle>
+              <AlertTitle>Test Information</AlertTitle>
               <AlertDescription>
-                هذا الاختبار يختبر جميع طرق الاتصال المتاحة: الاتصال المباشر، Vite Proxy، تسجيل الدخول، وإنشاء الأسئلة.
+                This test checks all available connection methods: direct connection, Vite Proxy, login, and question creation.
               </AlertDescription>
             </Box>
           </Alert>
 
           <Tabs variant="enclosed">
             <TabList>
-              <Tab>الاختبارات</Tab>
-              <Tab>النتائج</Tab>
+              <Tab>Tests</Tab>
+              <Tab>Results</Tab>
             </TabList>
 
             <TabPanels>
@@ -184,28 +184,28 @@ const ComprehensiveTest: React.FC = () => {
                     isLoading={isLoading}
                     loadingText="جاري تشغيل الاختبارات..."
                   >
-                    تشغيل جميع الاختبارات
+                    Run All Tests
                   </Button>
                   
                   <Button colorScheme="green" onClick={clearResults} width="full">
-                    مسح النتائج
+                    Clear Results
                   </Button>
 
                   <HStack spacing={4} width="full">
                     <Button colorScheme="teal" onClick={testDirectConnection} flex={1}>
-                      اختبار الاتصال المباشر
+                      Direct Connection Test
                     </Button>
                     <Button colorScheme="purple" onClick={testViteProxy} flex={1}>
-                      اختبار Vite Proxy
+                      Vite Proxy Test
                     </Button>
                   </HStack>
 
                   <HStack spacing={4} width="full">
                     <Button colorScheme="orange" onClick={testLogin} flex={1}>
-                      اختبار تسجيل الدخول
+                      Login Test
                     </Button>
                     <Button colorScheme="pink" onClick={testCreateQuestion} flex={1}>
-                      اختبار إنشاء سؤال
+                      Create Question Test
                     </Button>
                   </HStack>
                 </VStack>
@@ -216,7 +216,7 @@ const ComprehensiveTest: React.FC = () => {
                   {testResults.length === 0 ? (
                     <Alert status="warning">
                       <AlertIcon />
-                      لا توجد نتائج اختبار. قم بتشغيل الاختبارات أولاً.
+                      No test results. Please run the tests first.
                     </Alert>
                   ) : (
                     testResults.map((result, index) => (
@@ -227,7 +227,7 @@ const ComprehensiveTest: React.FC = () => {
                             <AlertTitle>{result.name}</AlertTitle>
                             <HStack spacing={2}>
                               <Badge colorScheme={getStatusColor(result.success)}>
-                                {getStatusIcon(result.success)} {result.success ? 'نجح' : 'فشل'}
+                                {getStatusIcon(result.success)} {result.success ? 'Success' : 'Failed'}
                               </Badge>
                               <Text fontSize="xs" color="gray.500">
                                 {result.timestamp.toLocaleTimeString()}

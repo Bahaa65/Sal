@@ -22,19 +22,43 @@ const HomeHeader = () => {
       p="16px 32px"
       align="center"
       boxShadow="md"
+      direction="row"
     >
-      <HStack spacing="18px" mr={4} minW="224px" maxW="224px" w="224px" justify="flex-start">
-        <Box as={RouterLink} to="/profile">
-          <Avatar w="40px" h="40px" name={user ? `${user.first_name} ${user.last_name}` : ''} src={user?.avatar} cursor="pointer" />
-        </Box>
+      {/* Logo and text on the left */}
+      <HStack spacing="8px" mr={4}>
+        <Image src="/images/logo.png" alt="Sal Logo" maxH="36px" filter="invert(1) brightness(2)" />
+        <Text fontSize="16px" color="whiteAlpha.800">any question</Text>
+      </HStack>
+      <Spacer />
+      {/* Search in the center */}
+      <InputGroup flex="1" maxWidth="300px" mx="auto">
+        <InputLeftElement
+          pointerEvents="none"
+          children={<SearchIcon color="gray.300" boxSize="20px" />}
+        />
+        <Input
+          type="text"
+          placeholder="Search"
+          bg="white"
+          borderRadius="full"
+          h="36px"
+          color="black"
+          textAlign="left"
+        />
+      </InputGroup>
+      <Spacer />
+      {/* User icons on the right */}
+      <HStack spacing="18px" ml={4} minW="224px" maxW="224px" w="224px" justify="flex-end">
         <IconButton
-          aria-label="Help"
-          icon={<QuestionOutlineIcon boxSize="20px" color="white" />}
+          aria-label="Home"
+          icon={<Box as={FaHome} boxSize="20px" color="white" />}
           isRound={true}
           size="md"
           bg="transparent"
           color="white"
           _hover={{ bg: 'blue.600' }}
+          as={RouterLink}
+          to="/home"
         />
         <IconButton
           aria-label="Notifications"
@@ -64,37 +88,17 @@ const HomeHeader = () => {
           to="/notifications"
         />
         <IconButton
-          aria-label="Home"
-          icon={<Box as={FaHome} boxSize="20px" color="white" />}
+          aria-label="Help"
+          icon={<QuestionOutlineIcon boxSize="20px" color="white" />}
           isRound={true}
           size="md"
           bg="transparent"
           color="white"
           _hover={{ bg: 'blue.600' }}
-          as={RouterLink}
-          to="/home"
         />
-      </HStack>
-      <Spacer />
-      <InputGroup flex="1" maxWidth="300px" mx="auto">
-        <InputLeftElement
-          pointerEvents="none"
-          children={<SearchIcon color="gray.300" boxSize="20px" />}
-        />
-        <Input
-          type="text"
-          placeholder="Search"
-          bg="white"
-          borderRadius="full"
-          h="36px"
-          color="black"
-          textAlign="left"
-        />
-      </InputGroup>
-      <Spacer />
-      <HStack spacing="8px" ml={4}>
-        <Text fontSize="16px" color="whiteAlpha.800">any question</Text>
-        <Image src="/images/logo.png" alt="Sal Logo" maxH="36px" filter="invert(1) brightness(2)" />
+        <Box as={RouterLink} to="/profile">
+          <Avatar w="40px" h="40px" name={user ? `${user.first_name} ${user.last_name}` : ''} src={user?.avatar} cursor="pointer" />
+        </Box>
       </HStack>
     </Flex>
   );

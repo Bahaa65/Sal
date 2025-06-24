@@ -96,41 +96,41 @@ const DirectTest: React.FC = () => {
       <Container maxW="container.lg">
         <VStack spacing={6} align="stretch">
           <Heading textAlign="center" color="blue.600">
-            اختبار الاتصال المباشر
+            Direct Connection Test
           </Heading>
           
           <Alert status="info" borderRadius="md">
             <AlertIcon />
             <Box>
-              <AlertTitle>ملاحظة مهمة</AlertTitle>
+              <AlertTitle>Important Note</AlertTitle>
               <AlertDescription>
-                هذا الاختبار يتجاوز CORS ويحاول الاتصال مباشرة بالخادم. 
-                قد لا يعمل في المتصفح العادي بسبب سياسات CORS.
+                This test bypasses CORS and tries to connect directly to the server.
+                It may not work in a regular browser due to CORS policies.
               </AlertDescription>
             </Box>
           </Alert>
           
           <VStack spacing={4}>
             <Button colorScheme="blue" onClick={runAllTests} width="full" size="lg">
-              تشغيل جميع الاختبارات
+              Run All Tests
             </Button>
             
             <Button colorScheme="green" onClick={clearResults} width="full">
-              مسح النتائج
+              Clear Results
             </Button>
           </VStack>
 
           <HStack spacing={4}>
             <Button colorScheme="teal" onClick={testDirectQuestions} flex={1}>
-              اختبار الأسئلة
+              Questions Test
             </Button>
             
             <Button colorScheme="purple" onClick={testDirectLogin} flex={1}>
-              اختبار تسجيل الدخول
+              Login Test
             </Button>
             
             <Button colorScheme="orange" onClick={testWithCredentials} flex={1}>
-              اختبار بيانات صحيحة
+              Valid Credentials Test
             </Button>
           </HStack>
 

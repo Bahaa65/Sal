@@ -15,9 +15,7 @@ import {
   MenuList,
   MenuItem,
   Icon,
-  useToast,
 } from "@chakra-ui/react";
-import { UpDownIcon } from "@chakra-ui/icons";
 import {
   FiArrowUp,
   FiArrowDown,
@@ -25,8 +23,6 @@ import {
   FiEdit,
   FiMoreVertical,
   FiUser,
-  FiEye,
-  FiFlag,
   FiX,
 } from "react-icons/fi";
 import AnswerModal from "./AnswerModal";
@@ -35,6 +31,7 @@ import apiClient from "../../services/apiClient";
 import AnswerCard from "./AnswerCard";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { voteQuestion } from '../../services/apiClient';
 
 // Assuming a User type similar to what's in AuthContext
 // This could be imported from a shared types file in a larger app
@@ -54,6 +51,7 @@ type Answer = {
   upvotes: number;
   downvotes: number;
   created_at: string;
+  images?: string[];
 };
 
 type QuestionCardProps = {
@@ -78,9 +76,8 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
   const { isOpen: isModalOpen, onOpen, onClose } = useDisclosure();
   const [showAnswers, setShowAnswers] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [isReporting, setIsReporting] = useState(false);
   const navigate = useNavigate();
-  const toast = useToast();
+  const [votes, setVotes] = useState({ upvotes: question.upvotes, downvotes: question.downvotes });
 
   const {
     data: answers,
@@ -96,25 +93,24 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     setShowAnswers(!showAnswers);
   };
 
-  const handleReport = async () => {
-    if (!window.confirm("هل أنت متأكد أنك تريد الإبلاغ عن هذا السؤال؟")) return;
-    setIsReporting(true);
-    try {
-      await apiClient.post("/report/question", { question_id: question.id });
-      toast({ title: "تم إرسال الإبلاغ بنجاح.", status: "success" });
-    } catch (e) {
-      toast({ title: "حدث خطأ أثناء الإبلاغ.", status: "error" });
-    } finally {
-      setIsReporting(false);
-    }
-  };
-
   const handleHide = () => {
     setHidden(true);
   };
 
   const handleViewProfile = () => {
     navigate(`/users/${question.user.username || question.user.id}`);
+  };
+
+  const handleVote = async (vote: 1 | 2) => {
+    try {
+      await voteQuestion(question.id, vote);
+      setVotes((prev) =>
+        vote === 1
+          ? { ...prev, upvotes: prev.upvotes + 1 }
+          : { ...prev, downvotes: prev.downvotes + 1 }
+      );
+    } catch (e) {
+    }
   };
 
   if (hidden) return null;
@@ -148,12 +144,12 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
 
         <Flex align="center" fontSize="sm" color="gray.600">
           <HStack spacing={1} mr={4}>
-            <IconButton aria-label="Upvote" icon={<FiArrowUp />} variant="ghost" size="sm" />
-            <Text>{question.upvotes}</Text>
+            <IconButton aria-label="Upvote" icon={<FiArrowUp />} variant="ghost" size="sm" onClick={() => handleVote(1)} />
+            <Text>{votes.upvotes}</Text>
           </HStack>
           <HStack spacing={1} mr={4}>
-            <IconButton aria-label="Downvote" icon={<FiArrowDown />} variant="ghost" size="sm" />
-            <Text>{question.downvotes}</Text>
+            <IconButton aria-label="Downvote" icon={<FiArrowDown />} variant="ghost" size="sm" onClick={() => handleVote(2)} />
+            <Text>{votes.downvotes}</Text>
           </HStack>
           <HStack spacing={1} mr={4} onClick={handleToggleAnswers} cursor="pointer">
             <IconButton

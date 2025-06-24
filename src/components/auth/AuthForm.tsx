@@ -15,7 +15,7 @@ const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children, isS
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     
-    // منع الإرسال إذا كان في حالة تحميل
+    // Prevent submission if loading
     if (isSubmitting) {
       return
     }
@@ -38,8 +38,8 @@ const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children, isS
 
     if (!allFieldsFilled) {
       toast({
-        title: 'خطأ',
-        description: 'الرجاء تعبئة جميع الحقول.',
+        title: 'Error',
+        description: 'Please fill in all required fields.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -65,7 +65,7 @@ const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children, isS
           color="white"
           _hover={{ bg: '#006CBE' }}
           isLoading={isSubmitting}
-          loadingText="جاري..."
+          loadingText="Loading..."
           isDisabled={isSubmitting}
         >
           {submitButtonText}

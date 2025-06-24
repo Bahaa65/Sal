@@ -91,7 +91,7 @@ const Profile = () => {
             </Box>
           )}
         </Flex>
-        {/* مكان عرض الأسئلة */}
+        {/* Questions section */}
         <Box mt={10}>
           <Text fontWeight="bold" fontSize="xl" mb={4}>Questions</Text>
           {loadingQuestions ? (

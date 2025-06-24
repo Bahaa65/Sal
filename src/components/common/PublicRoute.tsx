@@ -11,7 +11,7 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // عرض spinner أثناء التحقق من المصادقة
+  // Show spinner while checking authentication
   if (isLoading) {
     return (
       <Center h="100vh">
@@ -20,13 +20,13 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
     );
   }
 
-  // إذا كان المستخدم مسجل الدخول، توجيه إلى الصفحة الرئيسية
+  // If the user is logged in, redirect to the home page
   if (isAuthenticated) {
     const from = location.state?.from?.pathname || '/home';
     return <Navigate to={from} replace />;
   }
 
-  // إذا لم يكن مسجل الدخول، عرض المحتوى المطلوب
+  // If not logged in, show the requested content
   return <>{children}</>;
 };
 

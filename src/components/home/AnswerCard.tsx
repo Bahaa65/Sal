@@ -1,7 +1,8 @@
-import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer, Menu, MenuButton, MenuList, MenuItem, Icon, useToast } from '@chakra-ui/react';
+import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer, Menu, MenuButton, MenuList, MenuItem, Icon } from '@chakra-ui/react';
 import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { voteAnswer } from '../../services/apiClient';
 
 // This should ideally come from a shared types file
 type User = {
@@ -31,13 +32,25 @@ type AnswerCardProps = {
 const AnswerCard = ({ answer }: AnswerCardProps) => {
   const [hidden, setHidden] = useState(false);
   const navigate = useNavigate();
-  const toast = useToast();
+  const [votes, setVotes] = useState({ upvotes: answer.upvotes, downvotes: answer.downvotes });
 
   const handleHide = () => {
     setHidden(true);
   };
   const handleViewProfile = () => {
     navigate(`/users/${answer.user.username || answer.user.id}`);
+  };
+
+  const handleVote = async (vote: 1 | 2) => {
+    try {
+      await voteAnswer(answer.id, vote);
+      setVotes((prev) =>
+        vote === 1
+          ? { ...prev, upvotes: prev.upvotes + 1 }
+          : { ...prev, downvotes: prev.downvotes + 1 }
+      );
+    } catch (e) {
+    }
   };
 
   if (hidden) return null;
@@ -66,7 +79,7 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
 
       <Text mb={3}>{answer.content}</Text>
 
-      {/* عرض الصور إذا وُجدت */}
+      {/* Show images if present */}
       {answer.images && answer.images.length > 0 && (
         <Flex gap={2} mb={3} wrap="wrap">
           {answer.images.map((img, idx) => (
@@ -79,12 +92,12 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
 
       <Flex align="center" fontSize="sm" color="gray.600">
         <HStack spacing={1} mr={4}>
-          <IconButton aria-label="Upvote" icon={<FiArrowUp />} variant="ghost" size="sm" />
-          <Text>{answer.upvotes}</Text>
+          <IconButton aria-label="Upvote" icon={<FiArrowUp />} variant="ghost" size="sm" onClick={() => handleVote(1)} />
+          <Text>{votes.upvotes}</Text>
         </HStack>
         <HStack spacing={1} mr={4}>
-          <IconButton aria-label="Downvote" icon={<FiArrowDown />} variant="ghost" size="sm" />
-          <Text>{answer.downvotes}</Text>
+          <IconButton aria-label="Downvote" icon={<FiArrowDown />} variant="ghost" size="sm" onClick={() => handleVote(2)} />
+          <Text>{votes.downvotes}</Text>
         </HStack>
         <Spacer />
         <Text fontSize="xs" color="gray.500">{new Date(answer.created_at).toLocaleString()}</Text>

@@ -8,7 +8,7 @@ const config: ThemeConfig = {
 
 const theme = extendTheme({
   config,
-  direction: 'rtl',
+  direction: 'ltr',
 })
 
 export default theme 
