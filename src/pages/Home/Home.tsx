@@ -26,6 +26,7 @@ const Home = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const queryClient = useQueryClient();
   const [sortedQuestions, setSortedQuestions] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Use useQuery to fetch questions
   const { data: questions, isLoading, isError, error } = useQuery({
@@ -33,19 +34,38 @@ const Home = () => {
     queryFn: fetchQuestions,
   });
 
-  // Sort questions by vote score whenever questions data changes
+  // Sort and filter questions by vote score and search term
   useEffect(() => {
     if (questions) {
-      const sorted = [...questions].sort((a, b) => {
+      let filtered = questions;
+      
+      // Filter by search term
+      if (searchTerm.trim()) {
+        filtered = questions.filter((question: any) => 
+          question.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          question.user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          question.user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (question.user.job && question.user.job.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      }
+      
+      // Sort by vote score
+      const sorted = filtered.sort((a: any, b: any) => {
         const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
         const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
         return scoreB - scoreA; // Descending order (highest first)
       });
+      
       setSortedQuestions(sorted);
     } else {
       setSortedQuestions([]);
     }
-  }, [questions]);
+  }, [questions, searchTerm]);
+
+  // Handle search change
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+  };
 
   // Use useMutation to add a new question
   const mutation = useMutation({
@@ -64,7 +84,7 @@ const Home = () => {
   };
 
   return (
-    <MainLayout>
+    <MainLayout onSearchChange={handleSearchChange} showSearch={true}>
       <Container maxW="container.md" py={8}>
         <AskQuestionBox onClick={onOpen} />
 
@@ -80,6 +100,22 @@ const Home = () => {
           </Box>
         )}
 
+        {searchTerm && (
+          <Box my={4} p={3} bg="blue.50" borderRadius="md">
+            <Text fontSize="sm" color="blue.700">
+              Showing {sortedQuestions.length} result{sortedQuestions.length !== 1 ? 's' : ''} for "{searchTerm}"
+            </Text>
+          </Box>
+        )}
+
+        {sortedQuestions.length === 0 && !isLoading && !isError && (
+          <Box my={8} p={6} bg="white" borderRadius="lg" textAlign="center">
+            <Text fontSize="lg" color="gray.500">
+              {searchTerm ? 'No questions found matching your search.' : 'No questions available.'}
+            </Text>
+          </Box>
+        )}
+
         {sortedQuestions && sortedQuestions.map((q: any) => (
           <QuestionCard key={q.id} question={q} />
         ))}
@@ -88,7 +124,7 @@ const Home = () => {
           isOpen={isOpen}
           onClose={onClose}
           onSubmit={handleAddQuestion}
-          isSubmitting={mutation.isPending} // Pass mutation loading state to modal
+          isSubmitting={mutation.isPending}
         />
       </Container>
     </MainLayout>

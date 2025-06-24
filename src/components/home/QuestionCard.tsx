@@ -15,6 +15,7 @@ import {
   MenuList,
   MenuItem,
   Icon,
+  Input,
 } from "@chakra-ui/react";
 import {
   FiArrowUp,
@@ -79,6 +80,7 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
   const { isOpen: isModalOpen, onOpen, onClose } = useDisclosure();
   const [showAnswers, setShowAnswers] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [answerSearchTerm, setAnswerSearchTerm] = useState('');
   const navigate = useNavigate();
   const [votes, setVotes] = useState({ upvotes: question.upvotes, downvotes: question.downvotes });
   const [userVote, setUserVote] = useState<boolean | null>(question.viewer_vote || null);
@@ -100,12 +102,22 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     enabled: showAnswers, // Only fetch when showAnswers is true
   });
 
-  // Sort answers by vote score (upvotes - downvotes) in descending order
-  const sortedAnswers = answers ? [...answers].sort((a, b) => {
-    const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
-    const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
-    return scoreB - scoreA; // Descending order (highest first)
-  }) : [];
+  // Sort and filter answers by vote score and search term
+  const sortedAnswers = answers ? [...answers]
+    .filter((answer) => {
+      if (!answerSearchTerm.trim()) return true;
+      return (
+        answer.content.toLowerCase().includes(answerSearchTerm.toLowerCase()) ||
+        answer.user.first_name.toLowerCase().includes(answerSearchTerm.toLowerCase()) ||
+        answer.user.last_name.toLowerCase().includes(answerSearchTerm.toLowerCase()) ||
+        (answer.user.job && answer.user.job.toLowerCase().includes(answerSearchTerm.toLowerCase()))
+      );
+    })
+    .sort((a, b) => {
+      const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
+      const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
+      return scoreB - scoreA; // Descending order (highest first)
+    }) : [];
 
   const handleToggleAnswers = () => {
     setShowAnswers(!showAnswers);
@@ -236,9 +248,36 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
           <Box mt={4}>
             {isLoadingAnswers && <Flex justify="center"><Spinner /></Flex>}
             {isError && <Text color="red.500">Error fetching answers.</Text>}
+            
+            {!isLoadingAnswers && !isError && answers && answers.length > 0 && (
+              <Box mb={4}>
+                <Input
+                  placeholder="Search in answers..."
+                  value={answerSearchTerm}
+                  onChange={(e) => setAnswerSearchTerm(e.target.value)}
+                  size="sm"
+                  bg="white"
+                  borderRadius="md"
+                />
+                {answerSearchTerm && (
+                  <Text fontSize="xs" color="gray.500" mt={1}>
+                    Found {sortedAnswers.length} answer{sortedAnswers.length !== 1 ? 's' : ''}
+                  </Text>
+                )}
+              </Box>
+            )}
+            
             {sortedAnswers && sortedAnswers.map((answer) => (
               <AnswerCard key={answer.id} answer={answer} />
             ))}
+            
+            {sortedAnswers.length === 0 && !isLoadingAnswers && !isError && answers && answers.length > 0 && (
+              <Box p={4} bg="gray.50" borderRadius="md" textAlign="center">
+                <Text fontSize="sm" color="gray.500">
+                  No answers found matching your search.
+                </Text>
+              </Box>
+            )}
           </Box>
         </Collapse>
       </Box>

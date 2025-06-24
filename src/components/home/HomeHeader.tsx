@@ -5,14 +5,34 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { fetchNotifications } from '../../services/notifications';
+import { useState, useEffect } from 'react';
 
-const HomeHeader = () => {
+interface HomeHeaderProps {
+  onSearchChange?: (searchTerm: string) => void;
+  showSearch?: boolean;
+}
+
+const HomeHeader = ({ onSearchChange, showSearch = false }: HomeHeaderProps) => {
   const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { data } = useQuery({
     queryKey: ['notifications'],
     queryFn: fetchNotifications,
   });
+
+  // Debounce search to avoid too many API calls
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      onSearchChange?.(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, onSearchChange]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
   return (
     <Flex
@@ -30,22 +50,26 @@ const HomeHeader = () => {
         <Text fontSize="16px" color="whiteAlpha.800">any question</Text>
       </HStack>
       <Spacer />
-      {/* Search in the center */}
-      <InputGroup flex="1" maxWidth="300px" mx="auto">
-        <InputLeftElement
-          pointerEvents="none"
-          children={<SearchIcon color="gray.300" boxSize="20px" />}
-        />
-        <Input
-          type="text"
-          placeholder="Search"
-          bg="white"
-          borderRadius="full"
-          h="36px"
-          color="black"
-          textAlign="left"
-        />
-      </InputGroup>
+      {/* Search in the center - only show if showSearch is true */}
+      {showSearch && (
+        <InputGroup flex="1" maxWidth="300px" mx="auto">
+          <InputLeftElement
+            pointerEvents="none"
+            children={<SearchIcon color="gray.300" boxSize="20px" />}
+          />
+          <Input
+            type="text"
+            placeholder="Search questions..."
+            bg="white"
+            borderRadius="full"
+            h="36px"
+            color="black"
+            textAlign="left"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </InputGroup>
+      )}
       <Spacer />
       {/* User icons on the right */}
       <HStack spacing="18px" ml={4} minW="224px" maxW="224px" w="224px" justify="flex-end">
