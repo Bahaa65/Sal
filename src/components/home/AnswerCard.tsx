@@ -1,8 +1,9 @@
 import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer, Menu, MenuButton, MenuList, MenuItem, Icon } from '@chakra-ui/react';
 import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { voteAnswer } from '../../services/apiClient';
+import { useQueryClient } from "@tanstack/react-query";
 
 // This should ideally come from a shared types file
 type User = {
@@ -23,6 +24,7 @@ type Answer = {
   downvotes: number;
   created_at: string;
   images?: string[];
+  viewer_vote?: boolean | null; // true for upvote, false for downvote, null for no vote
 };
 
 type AnswerCardProps = {
@@ -33,6 +35,14 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
   const [hidden, setHidden] = useState(false);
   const navigate = useNavigate();
   const [votes, setVotes] = useState({ upvotes: answer.upvotes, downvotes: answer.downvotes });
+  const [userVote, setUserVote] = useState<boolean | null>(answer.viewer_vote || null);
+  const queryClient = useQueryClient();
+
+  // Update votes when answer data changes
+  useEffect(() => {
+    setVotes({ upvotes: answer.upvotes, downvotes: answer.downvotes });
+    setUserVote(answer.viewer_vote || null);
+  }, [answer.upvotes, answer.downvotes, answer.viewer_vote]);
 
   const handleHide = () => {
     setHidden(true);
@@ -43,13 +53,40 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
 
   const handleVote = async (vote: 1 | 2) => {
     try {
-      await voteAnswer(answer.id, vote);
-      setVotes((prev) =>
-        vote === 1
-          ? { ...prev, upvotes: prev.upvotes + 1 }
-          : { ...prev, downvotes: prev.downvotes + 1 }
-      );
+      // Optimistic update - update UI immediately
+      const optimisticVotes = { ...votes };
+      const optimisticUserVote = userVote;
+
+      // If user already voted the same way, remove the vote (vote: 0)
+      if ((vote === 1 && userVote === true) || (vote === 2 && userVote === false)) {
+        // Optimistic update
+        if (userVote === true) optimisticVotes.upvotes -= 1;
+        if (userVote === false) optimisticVotes.downvotes -= 1;
+        setVotes(optimisticVotes);
+        setUserVote(null);
+
+        await voteAnswer(answer.id, 0);
+      } else {
+        // If user voted differently or hasn't voted, apply the new vote
+        // Optimistic update
+        if (userVote === true) optimisticVotes.upvotes -= 1;
+        if (userVote === false) optimisticVotes.downvotes -= 1;
+        if (vote === 1) optimisticVotes.upvotes += 1;
+        if (vote === 2) optimisticVotes.downvotes += 1;
+        
+        setVotes(optimisticVotes);
+        setUserVote(vote === 1 ? true : false);
+
+        await voteAnswer(answer.id, vote);
+      }
+
+      // Invalidate answers query to trigger re-sorting
+      queryClient.invalidateQueries({ queryKey: ["answers"] });
     } catch (e) {
+      console.error('Vote error:', e);
+      // Revert optimistic update on error
+      setVotes({ upvotes: answer.upvotes, downvotes: answer.downvotes });
+      setUserVote(answer.viewer_vote || null);
     }
   };
 
@@ -92,11 +129,25 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
 
       <Flex align="center" fontSize="sm" color="gray.600">
         <HStack spacing={1} mr={4}>
-          <IconButton aria-label="Upvote" icon={<FiArrowUp />} variant="ghost" size="sm" onClick={() => handleVote(1)} />
+          <IconButton 
+            aria-label="Upvote" 
+            icon={<FiArrowUp />} 
+            variant={userVote === true ? "solid" : "ghost"}
+            colorScheme={userVote === true ? "blue" : "gray"}
+            size="sm" 
+            onClick={() => handleVote(1)} 
+          />
           <Text>{votes.upvotes}</Text>
         </HStack>
         <HStack spacing={1} mr={4}>
-          <IconButton aria-label="Downvote" icon={<FiArrowDown />} variant="ghost" size="sm" onClick={() => handleVote(2)} />
+          <IconButton 
+            aria-label="Downvote" 
+            icon={<FiArrowDown />} 
+            variant={userVote === false ? "solid" : "ghost"}
+            colorScheme={userVote === false ? "red" : "gray"}
+            size="sm" 
+            onClick={() => handleVote(2)} 
+          />
           <Text>{votes.downvotes}</Text>
         </HStack>
         <Spacer />

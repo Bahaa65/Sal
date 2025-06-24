@@ -29,9 +29,10 @@ import AnswerModal from "./AnswerModal";
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "../../services/apiClient";
 import AnswerCard from "./AnswerCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { voteQuestion } from '../../services/apiClient';
+import { useQueryClient } from "@tanstack/react-query";
 
 // Assuming a User type similar to what's in AuthContext
 // This could be imported from a shared types file in a larger app
@@ -52,6 +53,7 @@ type Answer = {
   downvotes: number;
   created_at: string;
   images?: string[];
+  viewer_vote?: boolean | null; // true for upvote, false for downvote, null for no vote
 };
 
 type QuestionCardProps = {
@@ -64,6 +66,7 @@ type QuestionCardProps = {
     answers_count: number; // Updated from 'commentsCount' to 'answers_count'
     created_at: string; // Updated from 'time' to 'created_at'
     job_title?: string;
+    viewer_vote?: boolean | null; // true for upvote, false for downvote, null for no vote
   };
 };
 
@@ -78,6 +81,14 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
   const [hidden, setHidden] = useState(false);
   const navigate = useNavigate();
   const [votes, setVotes] = useState({ upvotes: question.upvotes, downvotes: question.downvotes });
+  const [userVote, setUserVote] = useState<boolean | null>(question.viewer_vote || null);
+  const queryClient = useQueryClient();
+
+  // Update votes when question data changes
+  useEffect(() => {
+    setVotes({ upvotes: question.upvotes, downvotes: question.downvotes });
+    setUserVote(question.viewer_vote || null);
+  }, [question.upvotes, question.downvotes, question.viewer_vote]);
 
   const {
     data: answers,
@@ -88,6 +99,13 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     queryFn: () => fetchAnswers(question.id),
     enabled: showAnswers, // Only fetch when showAnswers is true
   });
+
+  // Sort answers by vote score (upvotes - downvotes) in descending order
+  const sortedAnswers = answers ? [...answers].sort((a, b) => {
+    const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
+    const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
+    return scoreB - scoreA; // Descending order (highest first)
+  }) : [];
 
   const handleToggleAnswers = () => {
     setShowAnswers(!showAnswers);
@@ -103,13 +121,40 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
 
   const handleVote = async (vote: 1 | 2) => {
     try {
-      await voteQuestion(question.id, vote);
-      setVotes((prev) =>
-        vote === 1
-          ? { ...prev, upvotes: prev.upvotes + 1 }
-          : { ...prev, downvotes: prev.downvotes + 1 }
-      );
+      // Optimistic update - update UI immediately
+      const optimisticVotes = { ...votes };
+      const optimisticUserVote = userVote;
+
+      // If user already voted the same way, remove the vote (vote: 0)
+      if ((vote === 1 && userVote === true) || (vote === 2 && userVote === false)) {
+        // Optimistic update
+        if (userVote === true) optimisticVotes.upvotes -= 1;
+        if (userVote === false) optimisticVotes.downvotes -= 1;
+        setVotes(optimisticVotes);
+        setUserVote(null);
+
+        await voteQuestion(question.id, 0);
+      } else {
+        // If user voted differently or hasn't voted, apply the new vote
+        // Optimistic update
+        if (userVote === true) optimisticVotes.upvotes -= 1;
+        if (userVote === false) optimisticVotes.downvotes -= 1;
+        if (vote === 1) optimisticVotes.upvotes += 1;
+        if (vote === 2) optimisticVotes.downvotes += 1;
+        
+        setVotes(optimisticVotes);
+        setUserVote(vote === 1 ? true : false);
+
+        await voteQuestion(question.id, vote);
+      }
+
+      // Invalidate questions query to trigger re-sorting
+      queryClient.invalidateQueries({ queryKey: ['questions'] });
     } catch (e) {
+      console.error('Vote error:', e);
+      // Revert optimistic update on error
+      setVotes({ upvotes: question.upvotes, downvotes: question.downvotes });
+      setUserVote(question.viewer_vote || null);
     }
   };
 
@@ -144,11 +189,25 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
 
         <Flex align="center" fontSize="sm" color="gray.600">
           <HStack spacing={1} mr={4}>
-            <IconButton aria-label="Upvote" icon={<FiArrowUp />} variant="ghost" size="sm" onClick={() => handleVote(1)} />
+            <IconButton 
+              aria-label="Upvote" 
+              icon={<FiArrowUp />} 
+              variant={userVote === true ? "solid" : "ghost"}
+              colorScheme={userVote === true ? "blue" : "gray"}
+              size="sm" 
+              onClick={() => handleVote(1)} 
+            />
             <Text>{votes.upvotes}</Text>
           </HStack>
           <HStack spacing={1} mr={4}>
-            <IconButton aria-label="Downvote" icon={<FiArrowDown />} variant="ghost" size="sm" onClick={() => handleVote(2)} />
+            <IconButton 
+              aria-label="Downvote" 
+              icon={<FiArrowDown />} 
+              variant={userVote === false ? "solid" : "ghost"}
+              colorScheme={userVote === false ? "red" : "gray"}
+              size="sm" 
+              onClick={() => handleVote(2)} 
+            />
             <Text>{votes.downvotes}</Text>
           </HStack>
           <HStack spacing={1} mr={4} onClick={handleToggleAnswers} cursor="pointer">
@@ -177,7 +236,7 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
           <Box mt={4}>
             {isLoadingAnswers && <Flex justify="center"><Spinner /></Flex>}
             {isError && <Text color="red.500">Error fetching answers.</Text>}
-            {answers && answers.map((answer) => (
+            {sortedAnswers && sortedAnswers.map((answer) => (
               <AnswerCard key={answer.id} answer={answer} />
             ))}
           </Box>

@@ -1,5 +1,6 @@
 import { Box, Container, useDisclosure, Spinner, Flex, Text } from '@chakra-ui/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import MainLayout from '../../components/home/MainLayout';
 import AskQuestionBox from '../../components/home/AskQuestionBox';
 import QuestionModal from '../../components/home/QuestionModal';
@@ -24,12 +25,27 @@ const addQuestion = async (newQuestion: { content: string }) => {
 const Home = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const queryClient = useQueryClient();
+  const [sortedQuestions, setSortedQuestions] = useState<any[]>([]);
 
   // Use useQuery to fetch questions
   const { data: questions, isLoading, isError, error } = useQuery({
     queryKey: ['questions'],
     queryFn: fetchQuestions,
   });
+
+  // Sort questions by vote score whenever questions data changes
+  useEffect(() => {
+    if (questions) {
+      const sorted = [...questions].sort((a, b) => {
+        const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
+        const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
+        return scoreB - scoreA; // Descending order (highest first)
+      });
+      setSortedQuestions(sorted);
+    } else {
+      setSortedQuestions([]);
+    }
+  }, [questions]);
 
   // Use useMutation to add a new question
   const mutation = useMutation({
@@ -64,7 +80,7 @@ const Home = () => {
           </Box>
         )}
 
-        {questions && questions.map((q: any) => (
+        {sortedQuestions && sortedQuestions.map((q: any) => (
           <QuestionCard key={q.id} question={q} />
         ))}
 
