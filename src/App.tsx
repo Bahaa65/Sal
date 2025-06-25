@@ -12,6 +12,7 @@ const Register = lazy(() => import('./pages/Auth/Register'))
 const Home = lazy(() => import('./pages/Home/Home'))
 const Profile = lazy(() => import('./pages/Profile/Profile'))
 const NotificationsPage = lazy(() => import('./pages/Home/Notifications'))
+const QuestionDetails = lazy(() => import('./pages/Home/QuestionDetails'))
 
 // Create a client
 const queryClient = new QueryClient()
@@ -52,6 +53,11 @@ function App() {
                 <Route path="/notifications" element={
                   <AuthGuard>
                     <NotificationsPage />
+                  </AuthGuard>
+                } />
+                <Route path="/questions/:id" element={
+                  <AuthGuard>
+                    <QuestionDetails />
                   </AuthGuard>
                 } />
                 <Route path="*" element={<Navigate to="/home" replace />} />

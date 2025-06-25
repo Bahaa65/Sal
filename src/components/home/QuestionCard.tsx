@@ -237,7 +237,14 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     }) : [];
 
   return (
-    <>
+    <Box
+      onClick={() => navigate(`/questions/${question.id}`)}
+      cursor="pointer"
+      _hover={{ boxShadow: 'lg', bg: 'gray.50' }}
+      transition="box-shadow 0.2s, background 0.2s"
+      position="relative"
+      mb={4}
+    >
       <Box bg="white" borderRadius="lg" boxShadow="md" p={4} mb={6}>
         <Flex align="center" mb={3}>
           <Avatar name={`${question.user.first_name} ${question.user.last_name}`} src={question.user.avatar} mr={3} />
@@ -381,7 +388,7 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-    </>
+    </Box>
   );
 };
 
