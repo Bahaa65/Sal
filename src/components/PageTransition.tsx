@@ -4,13 +4,12 @@ import { motion } from 'framer-motion'
 import { ReactNode } from 'react'
 import { pageTransition } from './common/animations'
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchNotifications, markNotificationAsRead } from '../services/notifications';
-import { List, ListItem, Button, Badge, Spinner, Flex, Text } from '@chakra-ui/react';
-import { useNotificationsQuery } from '../hooks/useNotificationsQuery';
-import { Notification } from '../types/Notification';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { List, ListItem, Button, Badge, Flex, Text } from '@chakra-ui/react';
 import { useInfiniteNotificationsQuery } from '../hooks/useInfiniteNotificationsQuery';
 import { useInView } from 'react-intersection-observer';
+import { markNotificationAsRead } from '../services/notifications';
+import { Notification } from '../types/Notification';
 
 const MotionBox = motion.create(Box)
 
@@ -44,7 +43,7 @@ export const NotificationsList = () => {
   const queryClient = useQueryClient();
   const markAsReadMutation = useMutation({
     mutationFn: (id: number) => markNotificationAsRead(id),
-    onSuccess: (data, id) => {
+    onSuccess: (_, id) => {
       queryClient.setQueryData(['notifications-infinite'], (oldData: any) => {
         if (!oldData) return oldData;
         return {

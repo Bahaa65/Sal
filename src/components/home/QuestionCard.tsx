@@ -34,16 +34,15 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 import AnswerModal from "./AnswerModal";
-import apiClient, { deleteQuestion } from "../../services/apiClient";
-import AnswerCard from "./AnswerCard";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { voteQuestion } from '../../services/apiClient';
+import { voteQuestion, deleteQuestion } from '../../services/apiClient';
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../contexts/AuthContext";
 import { useInfiniteAnswersQuery } from '../../hooks/useInfiniteAnswersQuery';
 import { useInView } from 'react-intersection-observer';
 import { Answer } from '../../types/Answer';
+import AnswerCard from './AnswerCard';
 
 // Assuming a User type similar to what's in AuthContext
 // This could be imported from a shared types file in a larger app
@@ -238,7 +237,6 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
 
   return (
     <Box
-      onClick={() => navigate(`/questions/${question.id}`)}
       cursor="pointer"
       _hover={{ boxShadow: 'lg', bg: 'gray.50' }}
       transition="box-shadow 0.2s, background 0.2s"
@@ -276,7 +274,9 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
         </Flex>
 
         <Box mb={4}>
-          <Text fontSize="lg" fontWeight="medium" mb={2}>{question.content}</Text>
+          <Text fontSize="lg" fontWeight="medium" mb={2} cursor="pointer" onClick={() => navigate(`/questions/${question.id}`)}>
+            {question.content}
+          </Text>
         </Box>
 
         <Flex align="center" fontSize="sm" color="gray.600">
@@ -302,39 +302,35 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
             />
             <Text>{votes.downvotes}</Text>
           </HStack>
-          <HStack spacing={1} mr={4} onClick={handleToggleAnswers} cursor="pointer">
+          <HStack spacing={1} mr={4} cursor="pointer">
             <IconButton
-              aria-label="Comments"
+              aria-label={showAnswers ? "Hide Answers" : "Show Answers"}
               icon={<FiMessageCircle />}
-              variant="ghost"
+              variant={showAnswers ? "solid" : "ghost"}
+              colorScheme={showAnswers ? "blue" : "gray"}
               size="sm"
-              isActive={showAnswers}
+              onClick={handleToggleAnswers}
             />
             <Text>{question.answers_count} Answers</Text>
           </HStack>
           <Spacer />
-          <Button
-            leftIcon={<FiEdit />}
-            size="sm"
-            variant="solid"
-            colorScheme="blue"
-            onClick={onOpen}
-          >
-            Answer
-          </Button>
         </Flex>
 
         {showAnswers && (
           <Box mt={4} mb={2}>
-            <Input
-              placeholder="Search answers..."
-              value={answerSearchTerm}
-              onChange={e => setAnswerSearchTerm(e.target.value)}
-              bg="white"
-              borderRadius="full"
-              mb={2}
-              maxW="300px"
-            />
+            <Flex align="center" alignItems="center">
+              <Avatar size="sm" name={auth.user ? auth.user.first_name + ' ' + auth.user.last_name : 'You'} src={auth.user?.avatar} mr={2} height="48px" width="48px" />
+              <Input
+                placeholder="Write your answer"
+                isReadOnly
+                onClick={onOpen}
+                borderRadius="full"
+                bg="gray.50"
+                maxW="700px"
+                flex={1}
+                height="48px"
+              />
+            </Flex>
           </Box>
         )}
 

@@ -1,4 +1,4 @@
-import { Box, Container, useDisclosure, Spinner, Flex, Text, Button, Skeleton, Stack, useToast } from '@chakra-ui/react';
+import { Box, Container, useDisclosure, Flex, Text, Button, Skeleton, Stack, useToast } from '@chakra-ui/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import MainLayout from '../../components/home/MainLayout';
@@ -7,7 +7,6 @@ import QuestionModal from '../../components/home/QuestionModal';
 import QuestionCard from '../../components/home/QuestionCard';
 import apiClient from '../../services/apiClient';
 import { useInfiniteQuestionsQuery } from '../../hooks/useInfiniteQuestionsQuery';
-import { useInfiniteAnswersQuery } from '../../hooks/useInfiniteAnswersQuery';
 import { Question } from '../../types/Question';
 import { useInView } from 'react-intersection-observer';
 import { useProfileQuery } from '../../hooks/useProfileQuery';

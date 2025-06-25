@@ -1,6 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
-import { PaginatedAnswers } from '../types/Answer';
 
 export const useInfiniteAnswersQuery = (questionId: number) =>
   useInfiniteQuery({

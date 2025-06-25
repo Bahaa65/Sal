@@ -1,6 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
-import { PaginatedNotifications } from '../types/Notification';
 
 export const useInfiniteNotificationsQuery = () =>
   useInfiniteQuery({

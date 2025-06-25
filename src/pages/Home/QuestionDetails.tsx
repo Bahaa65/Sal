@@ -1,23 +1,16 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Box, Button, Flex, Avatar, Text, Input, IconButton, VStack, HStack, useToast, Skeleton, Divider, Menu, MenuButton, MenuList, MenuItem, Spacer, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, useDisclosure } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX, FiTrash2 } from 'react-icons/fi';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import MainLayout from '../../components/home/MainLayout';
 import AnswerCard from '../../components/home/AnswerCard';
 import AnswerModal from '../../components/home/AnswerModal';
-import apiClient, { voteQuestion, deleteQuestion } from '../../services/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
-
-const fetchQuestion = async (id: string) => {
-  const { data } = await apiClient.get(`/questions/${id}`);
-  return data.data;
-};
-const fetchAnswers = async (id: string) => {
-  const { data } = await apiClient.get(`/questions/${id}/answers`);
-  return data.data;
-};
+import { useQuestionQuery } from '../../hooks/useQuestionQuery';
+import { useAnswersQuery } from '../../hooks/useAnswersQuery';
+import { voteQuestion, deleteQuestion } from '../../services/apiClient';
 
 const QuestionDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,19 +21,11 @@ const QuestionDetails = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const cancelRef = useRef(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data: question, isLoading: loadingQuestion } = useQuery({
-    queryKey: ['question', id],
-    queryFn: () => fetchQuestion(id!),
-    enabled: !!id,
-  });
-  const { data: answers, isLoading: loadingAnswers } = useQuery({
-    queryKey: ['answers', id],
-    queryFn: () => fetchAnswers(id!),
-    enabled: !!id,
-  });
+  const { data: question, isLoading: loadingQuestion } = useQuestionQuery(id!);
+  const { data: answers, isLoading: loadingAnswers } = useAnswersQuery(id!);
   const [votes, setVotes] = useState({ upvotes: question?.upvotes || 0, downvotes: question?.downvotes || 0 });
   const [userVote, setUserVote] = useState<boolean | null>(question?.viewer_vote || null);
-  React.useEffect(() => {
+  useEffect(() => {
     if (question) {
       setVotes({ upvotes: question.upvotes, downvotes: question.downvotes });
       setUserVote(question.viewer_vote || null);

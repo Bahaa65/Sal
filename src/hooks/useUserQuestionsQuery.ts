@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
-import { PaginatedQuestions } from '../types/Question';
 
 export const useUserQuestionsQuery = (username: string, page: number = 1) =>
   useQuery({

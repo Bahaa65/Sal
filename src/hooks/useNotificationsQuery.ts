@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '../services/apiClient';
-import { PaginatedNotifications } from '../types/Notification';
 
 export const useNotificationsQuery = (page: number = 1) =>
   useQuery({

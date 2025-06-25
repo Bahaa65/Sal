@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { Box, Flex, Input, InputGroup, InputLeftElement, Avatar, IconButton, HStack, Spacer, Image, Text, Badge } from '@chakra-ui/react';
 import { SearchIcon, BellIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
 import { FaHome } from "react-icons/fa";
@@ -5,7 +6,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchNotifications } from '../../services/notifications';
-import { useState, useEffect } from 'react';
 
 interface HomeHeaderProps {
   onSearchChange?: (searchTerm: string) => void;
