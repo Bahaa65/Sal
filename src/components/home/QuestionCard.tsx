@@ -43,6 +43,7 @@ import { useInfiniteAnswersQuery } from '../../hooks/useInfiniteAnswersQuery';
 import { useInView } from 'react-intersection-observer';
 import { Answer } from '../../types/Answer';
 import AnswerCard from './AnswerCard';
+import { formatRelativeTime } from '../../utils/format';
 
 // Assuming a User type similar to what's in AuthContext
 // This could be imported from a shared types file in a larger app
@@ -68,7 +69,6 @@ type QuestionCardProps = {
     viewer_vote?: boolean | null; // true for upvote, false for downvote, null for no vote
   };
 };
-
 
 const QuestionCard = ({ question }: QuestionCardProps) => {
   const { isOpen: isModalOpen, onOpen, onClose } = useDisclosure();
@@ -273,7 +273,7 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
           </Menu>
         </Flex>
 
-        <Box mb={4}>
+        <Box mb={4} display="flex" alignItems="center" justifyContent="space-between">
           <Text fontSize="lg" fontWeight="medium" mb={2} cursor="pointer" onClick={() => navigate(`/questions/${question.id}`)}>
             {question.content}
           </Text>
@@ -314,6 +314,9 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
             <Text>{question.answers_count} Answers</Text>
           </HStack>
           <Spacer />
+          <Text fontSize="sm" color="gray.500" whiteSpace="nowrap">
+            {formatRelativeTime(question.created_at)}
+          </Text>
         </Flex>
 
         {showAnswers && (
