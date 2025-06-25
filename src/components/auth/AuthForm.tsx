@@ -41,7 +41,7 @@ const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children, isS
         title: 'Error',
         description: 'Please fill in all required fields.',
         status: 'error',
-        duration: 3000,
+        duration: 4000,
         isClosable: true,
         position: 'top-right',
       })

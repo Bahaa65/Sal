@@ -1,20 +1,16 @@
-import { Box, Container, useDisclosure, Spinner, Flex, Text } from '@chakra-ui/react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Box, Container, useDisclosure, Spinner, Flex, Text, Button, Skeleton, Stack, useToast } from '@chakra-ui/react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import MainLayout from '../../components/home/MainLayout';
 import AskQuestionBox from '../../components/home/AskQuestionBox';
 import QuestionModal from '../../components/home/QuestionModal';
 import QuestionCard from '../../components/home/QuestionCard';
 import apiClient from '../../services/apiClient';
-
-// Define the function to fetch questions
-const fetchQuestions = async () => {
-  const { data } = await apiClient.get('/questions');
-  if (data && data.success) {
-    return data.data; // The backend returns questions in a 'data' property
-  }
-  throw new Error('Failed to fetch questions');
-};
+import { useInfiniteQuestionsQuery } from '../../hooks/useInfiniteQuestionsQuery';
+import { useInfiniteAnswersQuery } from '../../hooks/useInfiniteAnswersQuery';
+import { Question } from '../../types/Question';
+import { useInView } from 'react-intersection-observer';
+import { useProfileQuery } from '../../hooks/useProfileQuery';
 
 // Define the function to add a new question
 const addQuestion = async (newQuestion: { content: string }) => {
@@ -27,35 +23,50 @@ const Home = () => {
   const queryClient = useQueryClient();
   const [sortedQuestions, setSortedQuestions] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const toast = useToast();
+  const { data: profile } = useProfileQuery();
 
-  // Use useQuery to fetch questions
-  const { data: questions, isLoading, isError, error } = useQuery({
-    queryKey: ['questions'],
-    queryFn: fetchQuestions,
-  });
+  // Use useInfiniteQuestionsQuery to fetch questions
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuestionsQuery();
+  const questions = data ? data.pages.flatMap(page => page.data) : [];
 
   // Sort and filter questions by vote score and search term
   useEffect(() => {
     if (questions) {
+      console.log('searchTerm:', searchTerm);
       let filtered = questions;
-      
-      // Filter by search term
       if (searchTerm.trim()) {
-        filtered = questions.filter((question: any) => 
-          question.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          question.user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          question.user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (question.user.job && question.user.job.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
+        const search = searchTerm.trim().toLowerCase();
+        filtered = questions.filter((question: any) => {
+          const content = (question.content || '').toString().trim().toLowerCase();
+          const firstName = (question.user?.first_name || '').toString().trim().toLowerCase();
+          const lastName = (question.user?.last_name || '').toString().trim().toLowerCase();
+          const job = (question.user?.job || '').toString().trim().toLowerCase();
+          const match =
+            content.includes(search) ||
+            firstName.includes(search) ||
+            lastName.includes(search) ||
+            job.includes(search);
+          if (match) {
+            console.log('MATCH:', { content, firstName, lastName, job, search });
+          }
+          return match;
+        });
       }
-      
       // Sort by vote score
       const sorted = filtered.sort((a: any, b: any) => {
         const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
         const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
         return scoreB - scoreA; // Descending order (highest first)
       });
-      
       setSortedQuestions(sorted);
     } else {
       setSortedQuestions([]);
@@ -71,27 +82,82 @@ const Home = () => {
   const mutation = useMutation({
     mutationFn: addQuestion,
     onSuccess: () => {
-      // When a new question is added successfully, invalidate the 'questions' query
-      // This will cause React Query to refetch the questions and update the UI
       queryClient.invalidateQueries({ queryKey: ['questions'] });
-      onClose(); // Close the modal
+      if (profile?.username) {
+        queryClient.invalidateQueries({ queryKey: ['user-questions-infinite', profile.username] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['user-questions-infinite'] });
+      }
+      onClose();
+      toast({
+        title: 'Question added!',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
     },
-    // You can also add onError to handle mutation errors with a toast, for example
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error?.message || 'Failed to add question',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-right',
+      });
+    },
   });
 
   const handleAddQuestion = (newQuestionData: { content: string }) => {
     mutation.mutate(newQuestionData);
   };
 
+  const { ref, inView } = useInView({ triggerOnce: false });
+
+  // Fetch next page when inView changes to true
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Prefetch profile and notifications data for instant navigation
+  useEffect(() => {
+    queryClient.prefetchQuery({
+      queryKey: ['profile'],
+      queryFn: async () => {
+        const { data } = await apiClient.get('/profile');
+        return data.data;
+      },
+      staleTime: 1000 * 60 * 10,
+    });
+    queryClient.prefetchQuery({
+      queryKey: ['notifications', 1],
+      queryFn: async () => {
+        const { data } = await apiClient.get('/notifications?page=1');
+        return data;
+      },
+      staleTime: 1000 * 60 * 2,
+    });
+  }, [queryClient]);
+
   return (
-    <MainLayout onSearchChange={handleSearchChange} showSearch={true}>
+    <MainLayout
+      onSearchChange={handleSearchChange}
+      showSearch={true}
+      searchTerm={searchTerm}
+      setSearchTerm={setSearchTerm}
+    >
       <Container maxW="container.md" py={8}>
         <AskQuestionBox onClick={onOpen} />
 
         {isLoading && (
-          <Flex justify="center" align="center" py={10}>
-            <Spinner size="xl" />
-          </Flex>
+          <Stack spacing={6} py={10}>
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} height="80px" borderRadius="lg" />
+            ))}
+          </Stack>
         )}
 
         {isError && (
@@ -116,9 +182,23 @@ const Home = () => {
         </Box>
         )}
 
-        {sortedQuestions && sortedQuestions.map((q: any) => (
-          <QuestionCard key={q.id} question={q} />
+        {sortedQuestions && sortedQuestions.map((q: Question) => (
+          <QuestionCard key={q.id} question={{ ...q, answers_count: q.answers_count ?? 0 }} />
         ))}
+
+        {/* Infinite scroll observer */}
+        {hasNextPage && (
+          <div ref={ref} style={{ height: 1 }} />
+        )}
+
+        {/* Fallback Load More button if needed */}
+        {hasNextPage && !inView && (
+          <Flex justify="center" mt={6}>
+            <Button onClick={() => fetchNextPage()} isLoading={isFetchingNextPage}>
+              Load More
+            </Button>
+      </Flex>
+        )}
 
         <QuestionModal
           isOpen={isOpen}

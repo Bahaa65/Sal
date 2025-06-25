@@ -6,12 +6,14 @@ interface MainLayoutProps {
   children: React.ReactNode;
   onSearchChange?: (searchTerm: string) => void;
   showSearch?: boolean;
+  searchTerm?: string;
+  setSearchTerm?: (term: string) => void;
 }
 
-const MainLayout = ({ children, onSearchChange, showSearch = false }: MainLayoutProps) => {
+const MainLayout = ({ children, onSearchChange, showSearch = false, searchTerm, setSearchTerm }: MainLayoutProps) => {
   return (
     <Box minH="100vh" bg="gray.100">
-      <HomeHeader onSearchChange={onSearchChange} showSearch={showSearch} />
+      <HomeHeader onSearchChange={onSearchChange} showSearch={showSearch} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {children}
     </Box>
   );

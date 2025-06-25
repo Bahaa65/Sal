@@ -54,12 +54,24 @@ const AnswerModal = ({ isOpen, onClose, questionId }: AnswerModalProps) => {
             : `${import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000'}/uploads/${data.path}`;
           uploaded.push(url);
         } catch (error) {
-          toast({ title: `Failed to upload image: ${file.name}`, status: "error" });
+          toast({
+            title: `Failed to upload image: ${file.name}`,
+            status: 'error',
+            duration: 4000,
+            isClosable: true,
+            position: 'top-right',
+          });
         }
       }
       setImages((prev) => [...prev, ...uploaded]);
       setIsUploading(false);
-      if (uploaded.length > 0) toast({ title: "Images uploaded successfully.", status: "success" });
+      if (uploaded.length > 0) toast({
+        title: 'Images uploaded successfully.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
     }
   };
 
@@ -74,11 +86,12 @@ const AnswerModal = ({ isOpen, onClose, questionId }: AnswerModalProps) => {
       queryClient.invalidateQueries({ queryKey: ["answers", questionId] });
       queryClient.invalidateQueries({ queryKey: ["questions"] });
       toast({
-        title: "Answer submitted.",
-        description: "Your answer has been posted successfully.",
-        status: "success",
-        duration: 5000,
+        title: 'Answer submitted.',
+        description: 'Your answer has been posted successfully.',
+        status: 'success',
+        duration: 3000,
         isClosable: true,
+        position: 'top-right',
       });
       onClose();
       setContent("");
@@ -90,13 +103,12 @@ const AnswerModal = ({ isOpen, onClose, questionId }: AnswerModalProps) => {
         console.log("Server response:", error.response.data);
       }
       toast({
-        title: "An error occurred.",
-        description:
-          error.response?.data?.detail ||
-          "Unable to submit your answer. Please try again.",
-        status: "error",
-        duration: 5000,
+        title: 'An error occurred.',
+        description: error.response?.data?.detail || 'Unable to submit your answer. Please try again.',
+        status: 'error',
+        duration: 4000,
         isClosable: true,
+        position: 'top-right',
       });
     },
   });
@@ -104,10 +116,11 @@ const AnswerModal = ({ isOpen, onClose, questionId }: AnswerModalProps) => {
   const handleSubmit = () => {
     if (!content.trim()) {
       toast({
-        title: "Answer cannot be empty.",
-        status: "warning",
+        title: 'Answer cannot be empty.',
+        status: 'warning',
         duration: 3000,
         isClosable: true,
+        position: 'top-right',
       });
       return;
     }

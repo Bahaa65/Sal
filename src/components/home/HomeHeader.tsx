@@ -3,23 +3,26 @@ import { SearchIcon, BellIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
 import { FaHome } from "react-icons/fa";
 import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchNotifications } from '../../services/notifications';
 import { useState, useEffect } from 'react';
 
 interface HomeHeaderProps {
   onSearchChange?: (searchTerm: string) => void;
   showSearch?: boolean;
+  searchTerm?: string;
+  setSearchTerm?: (term: string) => void;
 }
 
-const HomeHeader = ({ onSearchChange, showSearch = false }: HomeHeaderProps) => {
+const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSearchTerm }: HomeHeaderProps) => {
   const { user } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
 
   const { data } = useQuery({
     queryKey: ['notifications'],
     queryFn: fetchNotifications,
   });
+
+  const queryClient = useQueryClient();
 
   // Debounce search to avoid too many API calls
   useEffect(() => {
@@ -31,7 +34,29 @@ const HomeHeader = ({ onSearchChange, showSearch = false }: HomeHeaderProps) => 
   }, [searchTerm, onSearchChange]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    setSearchTerm?.(e.target.value);
+  };
+
+  // Prefetch profile and notifications on hover
+  const prefetchProfile = () => {
+    queryClient.prefetchQuery({
+      queryKey: ['profile'],
+      queryFn: async () => {
+        const { data } = await fetch('/api/profile').then(res => res.json());
+        return data.data;
+      },
+      staleTime: 1000 * 60 * 10,
+    });
+  };
+  const prefetchNotifications = () => {
+    queryClient.prefetchQuery({
+      queryKey: ['notifications', 1],
+      queryFn: async () => {
+        const { data } = await fetch('/api/notifications?page=1').then(res => res.json());
+        return data;
+      },
+      staleTime: 1000 * 60 * 2,
+    });
   };
 
   return (
@@ -110,6 +135,7 @@ const HomeHeader = ({ onSearchChange, showSearch = false }: HomeHeaderProps) => 
           _hover={{ bg: 'blue.600' }}
           as={RouterLink}
           to="/notifications"
+          onMouseEnter={prefetchNotifications}
         />
         <IconButton
           aria-label="Help"
@@ -120,7 +146,7 @@ const HomeHeader = ({ onSearchChange, showSearch = false }: HomeHeaderProps) => 
           color="white"
           _hover={{ bg: 'blue.600' }}
         />
-        <Box as={RouterLink} to="/profile">
+        <Box as={RouterLink} to="/profile" onMouseEnter={prefetchProfile}>
           <Avatar w="40px" h="40px" name={user ? `${user.first_name} ${user.last_name}` : ''} src={user?.avatar} cursor="pointer" />
         </Box>
       </HStack>

@@ -8,14 +8,12 @@ import {
   Spacer,
   useDisclosure,
   Button,
-  Collapse,
   Spinner,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   Icon,
-  Input,
   useToast,
   AlertDialog,
   AlertDialogBody,
@@ -23,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  Input,
 } from "@chakra-ui/react";
 import {
   FiArrowUp,
@@ -35,7 +34,6 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 import AnswerModal from "./AnswerModal";
-import { useQuery } from "@tanstack/react-query";
 import apiClient, { deleteQuestion } from "../../services/apiClient";
 import AnswerCard from "./AnswerCard";
 import { useState, useEffect, useRef } from "react";
@@ -43,6 +41,9 @@ import { useNavigate } from "react-router-dom";
 import { voteQuestion } from '../../services/apiClient';
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../contexts/AuthContext";
+import { useInfiniteAnswersQuery } from '../../hooks/useInfiniteAnswersQuery';
+import { useInView } from 'react-intersection-observer';
+import { Answer } from '../../types/Answer';
 
 // Assuming a User type similar to what's in AuthContext
 // This could be imported from a shared types file in a larger app
@@ -53,17 +54,6 @@ type User = {
   avatar?: string;
   job?: string;
   username?: string;
-};
-
-type Answer = {
-  id: number;
-  user: User;
-  content: string;
-  upvotes: number;
-  downvotes: number;
-  created_at: string;
-  images?: string[];
-  viewer_vote?: boolean | null; // true for upvote, false for downvote, null for no vote
 };
 
 type QuestionCardProps = {
@@ -80,10 +70,6 @@ type QuestionCardProps = {
   };
 };
 
-const fetchAnswers = async (questionId: number) => {
-  const { data } = await apiClient.get(`/questions/${questionId}/answers`);
-  return data.data; // Assuming answers are in a 'data' property
-};
 
 const QuestionCard = ({ question }: QuestionCardProps) => {
   const { isOpen: isModalOpen, onOpen, onClose } = useDisclosure();
@@ -98,6 +84,16 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
   const auth = useAuth();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const { ref: answersRef, inView: answersInView } = useInView({ triggerOnce: false });
+  const {
+    data: answersData,
+    isLoading: isLoadingAnswers,
+    isError: isErrorAnswers,
+    fetchNextPage: fetchNextAnswersPage,
+    hasNextPage: hasNextAnswersPage,
+    isFetchingNextPage: isFetchingNextAnswersPage,
+  } = useInfiniteAnswersQuery(question.id);
+  const answers = answersData ? answersData.pages.flatMap(page => page.data) : [];
 
   // Check if current user is the question owner
   const isQuestionOwner = auth.user?.id === question.user.id;
@@ -114,32 +110,12 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     setUserVote(question.viewer_vote || null);
   }, [question.upvotes, question.downvotes, question.viewer_vote]);
 
-  const {
-    data: answers,
-    isLoading: isLoadingAnswers,
-    isError,
-  } = useQuery<Answer[]>({
-    queryKey: ["answers", question.id],
-    queryFn: () => fetchAnswers(question.id),
-    enabled: showAnswers, // Only fetch when showAnswers is true
-  });
-
-  // Sort and filter answers by vote score and search term
-  const sortedAnswers = answers ? [...answers]
-    .filter((answer) => {
-      if (!answerSearchTerm.trim()) return true;
-      return (
-        answer.content.toLowerCase().includes(answerSearchTerm.toLowerCase()) ||
-        answer.user.first_name.toLowerCase().includes(answerSearchTerm.toLowerCase()) ||
-        answer.user.last_name.toLowerCase().includes(answerSearchTerm.toLowerCase()) ||
-        (answer.user.job && answer.user.job.toLowerCase().includes(answerSearchTerm.toLowerCase()))
-      );
-    })
-    .sort((a, b) => {
-      const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
-      const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
-      return scoreB - scoreA; // Descending order (highest first)
-    }) : [];
+  // Fetch next page of answers when inView changes to true
+  useEffect(() => {
+    if (answersInView && hasNextAnswersPage && !isFetchingNextAnswersPage && showAnswers) {
+      fetchNextAnswersPage();
+    }
+  }, [answersInView, hasNextAnswersPage, isFetchingNextAnswersPage, fetchNextAnswersPage, showAnswers]);
 
   const handleToggleAnswers = () => {
     setShowAnswers(!showAnswers);
@@ -167,6 +143,13 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
         setUserVote(null);
 
         await voteQuestion(question.id, 0);
+        toast({
+          title: 'Vote removed',
+          status: 'success',
+          duration: 2000,
+          isClosable: true,
+          position: 'top-right',
+        });
       } else {
         // If user voted differently or hasn't voted, apply the new vote
         // Optimistic update
@@ -179,6 +162,13 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
         setUserVote(vote === 1 ? true : false);
 
         await voteQuestion(question.id, vote);
+        toast({
+          title: vote === 1 ? 'Upvoted!' : 'Downvoted!',
+          status: 'success',
+          duration: 2000,
+          isClosable: true,
+          position: 'top-right',
+        });
       }
 
       // Invalidate questions query to trigger re-sorting
@@ -188,6 +178,14 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
       // Revert optimistic update on error
       setVotes({ upvotes: question.upvotes, downvotes: question.downvotes });
       setUserVote(question.viewer_vote || null);
+      toast({
+        title: 'Error',
+        description: 'Failed to vote. Please try again.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-right',
+      });
     }
   };
 
@@ -195,10 +193,11 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     try {
       await deleteQuestion(question.id);
       toast({
-        title: "Question deleted successfully",
-        status: "success",
+        title: 'Question deleted successfully',
+        status: 'success',
         duration: 3000,
         isClosable: true,
+        position: 'top-right',
       });
       // Invalidate questions query to refresh the list
       queryClient.invalidateQueries({ queryKey: ['questions'] });
@@ -208,17 +207,34 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
     } catch (e) {
       console.error('Error deleting question:', e);
       toast({
-        title: "Error deleting question",
-        description: "An error occurred while deleting the question",
-        status: "error",
-        duration: 3000,
+        title: 'Error deleting question',
+        description: 'An error occurred while deleting the question',
+        status: 'error',
+        duration: 4000,
         isClosable: true,
+        position: 'top-right',
       });
       setIsDeleteDialogOpen(false);
     }
   };
 
   if (hidden) return null;
+
+  // Sort and filter answers by vote score and search term
+  const sortedAnswers = answers ? [...answers]
+    .filter((answer: Answer) => {
+      if (!answerSearchTerm.trim()) return true;
+      return (
+        answer.content.toLowerCase().includes(answerSearchTerm.toLowerCase()) ||
+        answer.user.first_name.toLowerCase().includes(answerSearchTerm.toLowerCase()) ||
+        answer.user.last_name.toLowerCase().includes(answerSearchTerm.toLowerCase())
+      );
+    })
+    .sort((a: Answer, b: Answer) => {
+      const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
+      const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
+      return scoreB - scoreA; // Descending order (highest first)
+    }) : [];
 
   return (
     <>
@@ -301,42 +317,41 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
           </Button>
         </Flex>
 
-        <Collapse in={showAnswers} animateOpacity>
-          <Box mt={4}>
-            {isLoadingAnswers && <Flex justify="center"><Spinner /></Flex>}
-            {isError && <Text color="red.500">Error fetching answers.</Text>}
-            
-            {!isLoadingAnswers && !isError && answers && answers.length > 0 && (
-              <Box mb={4}>
-                <Input
-                  placeholder="Search in answers..."
-                  value={answerSearchTerm}
-                  onChange={(e) => setAnswerSearchTerm(e.target.value)}
-                  size="sm"
-                  bg="white"
-                  borderRadius="md"
-                />
-                {answerSearchTerm && (
-                  <Text fontSize="xs" color="gray.500" mt={1}>
-                    Found {sortedAnswers.length} answer{sortedAnswers.length !== 1 ? 's' : ''}
-                  </Text>
-                )}
-              </Box>
+        {showAnswers && (
+          <Box mt={4} mb={2}>
+            <Input
+              placeholder="Search answers..."
+              value={answerSearchTerm}
+              onChange={e => setAnswerSearchTerm(e.target.value)}
+              bg="white"
+              borderRadius="full"
+              mb={2}
+              maxW="300px"
+            />
+          </Box>
+        )}
+
+        {showAnswers && (
+          <Box mt={2}>
+            {isLoadingAnswers ? (
+              <Spinner />
+            ) : isErrorAnswers ? (
+              <Text color="red.500">Error loading answers.</Text>
+            ) : (
+              sortedAnswers.map((answer: Answer) => (
+                <AnswerCard key={answer.id} answer={answer} />
+              ))
             )}
-            
-            {sortedAnswers && sortedAnswers.map((answer) => (
-              <AnswerCard key={answer.id} answer={answer} />
-            ))}
-            
-            {sortedAnswers.length === 0 && !isLoadingAnswers && !isError && answers && answers.length > 0 && (
-              <Box p={4} bg="gray.50" borderRadius="md" textAlign="center">
-                <Text fontSize="sm" color="gray.500">
-                  No answers found matching your search.
-                </Text>
-              </Box>
+            {hasNextAnswersPage && (
+              <div ref={answersRef} style={{ height: 1 }} />
+            )}
+            {hasNextAnswersPage && !isFetchingNextAnswersPage && (
+              <Button onClick={() => fetchNextAnswersPage()} mt={2} size="sm">
+                Load More Answers
+              </Button>
             )}
           </Box>
-        </Collapse>
+        )}
       </Box>
       <AnswerModal isOpen={isModalOpen} onClose={onClose} questionId={question.id} />
       <AlertDialog

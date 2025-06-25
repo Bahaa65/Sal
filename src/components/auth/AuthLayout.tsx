@@ -38,16 +38,19 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
           height="100vh"
           width="100%"
         >
+          <Box width="500px" height="400px" display="flex" alignItems="center" justifyContent="center">
           <Image
             src="/images/5167170.png"
             alt="People asking questions illustration"
-            maxH="full"
+              width="500px"
+              height="400px"
             objectFit="contain"
             onError={(e) => {
               const target = e.target as HTMLImageElement
               target.src = "https://via.placeholder.com/500x400?text=Auth+Illustration"
             }}
           />
+          </Box>
         </Box>
 
         {/* Left Section - Auth Form */}

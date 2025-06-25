@@ -79,6 +79,13 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
         setUserVote(null);
 
         await voteAnswer(answer.id, 0);
+        toast({
+          title: 'Vote removed',
+          status: 'success',
+          duration: 2000,
+          isClosable: true,
+          position: 'top-right',
+        });
       } else {
         // If user voted differently or hasn't voted, apply the new vote
         // Optimistic update
@@ -91,6 +98,13 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
         setUserVote(vote === 1 ? true : false);
 
         await voteAnswer(answer.id, vote);
+        toast({
+          title: vote === 1 ? 'Upvoted!' : 'Downvoted!',
+          status: 'success',
+          duration: 2000,
+          isClosable: true,
+          position: 'top-right',
+        });
       }
 
       // Invalidate answers query to trigger re-sorting
@@ -100,6 +114,14 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
       // Revert optimistic update on error
       setVotes({ upvotes: answer.upvotes, downvotes: answer.downvotes });
       setUserVote(answer.viewer_vote || null);
+      toast({
+        title: 'Error',
+        description: 'Failed to vote. Please try again.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-right',
+      });
     }
   };
 
@@ -107,11 +129,12 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
     try {
       await deleteAnswer(answer.id);
       toast({
-        title: "Answer deleted",
-        description: "The answer has been successfully deleted.",
-        status: "success",
-        duration: 5000,
+        title: 'Answer deleted',
+        description: 'The answer has been successfully deleted.',
+        status: 'success',
+        duration: 3000,
         isClosable: true,
+        position: 'top-right',
       });
       queryClient.invalidateQueries({ queryKey: ["answers"] });
       setHidden(true);
@@ -119,11 +142,12 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
     } catch (e) {
       console.error('Delete error:', e);
       toast({
-        title: "Error",
-        description: "An error occurred while deleting the answer.",
-        status: "error",
-        duration: 5000,
+        title: 'Error',
+        description: 'An error occurred while deleting the answer.',
+        status: 'error',
+        duration: 4000,
         isClosable: true,
+        position: 'top-right',
       });
       setIsDeleteDialogOpen(false);
     }
