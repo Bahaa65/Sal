@@ -27,7 +27,6 @@ import {
   FiArrowUp,
   FiArrowDown,
   FiMessageCircle,
-  FiEdit,
   FiMoreVertical,
   FiUser,
   FiX,
@@ -74,7 +73,7 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
   const { isOpen: isModalOpen, onOpen, onClose } = useDisclosure();
   const [showAnswers, setShowAnswers] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [answerSearchTerm, setAnswerSearchTerm] = useState('');
+  const [answerSearchTerm] = useState('');
   const navigate = useNavigate();
   const [votes, setVotes] = useState({ upvotes: question.upvotes, downvotes: question.downvotes });
   const [userVote, setUserVote] = useState<boolean | null>(question.viewer_vote || null);

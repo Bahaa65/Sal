@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Box, Flex, Input, InputGroup, InputLeftElement, Avatar, IconButton, HStack, Spacer, Image, Text, Badge } from '@chakra-ui/react';
 import { SearchIcon, BellIcon, QuestionOutlineIcon } from '@chakra-ui/icons';
 import { FaHome } from "react-icons/fa";
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchNotifications } from '../../services/notifications';
@@ -16,6 +16,7 @@ interface HomeHeaderProps {
 
 const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSearchTerm }: HomeHeaderProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { data } = useQuery({
     queryKey: ['notifications'],
@@ -138,13 +139,15 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
           onMouseEnter={prefetchNotifications}
         />
         <IconButton
-          aria-label="Help"
+          aria-label="Technical Support"
+          title="Technical Support"
           icon={<QuestionOutlineIcon boxSize="20px" color="white" />}
           isRound={true}
           size="md"
           bg="transparent"
           color="white"
           _hover={{ bg: 'blue.600' }}
+          onClick={() => navigate('/support')}
         />
         <Box as={RouterLink} to="/profile" onMouseEnter={prefetchProfile}>
           <Avatar w="40px" h="40px" name={user ? `${user.first_name} ${user.last_name}` : ''} src={user?.avatar} cursor="pointer" />
