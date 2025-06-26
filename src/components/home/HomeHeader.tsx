@@ -56,6 +56,9 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
   // Check if we're on profile page
   const isOnProfilePage = location.pathname === '/profile' || location.pathname.startsWith('/users/');
 
+  // Check if we're on current user's profile page (not other user's profile)
+  const isOnCurrentUserProfile = location.pathname === '/profile';
+
   // Debounce search to avoid too many API calls
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -207,7 +210,7 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
               />
             </MenuButton>
             <MenuList>
-              {!isOnProfilePage && (
+              {!isOnCurrentUserProfile && (
                 <MenuItem 
                   icon={<FaUser />} 
                   onClick={() => navigate('/profile')}
