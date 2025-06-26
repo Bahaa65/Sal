@@ -8,7 +8,7 @@ const SimpleTest: React.FC = () => {
     try {
       setTestResult('Testing direct connection...');
       
-      const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/questions/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/questions/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

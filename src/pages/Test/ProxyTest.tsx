@@ -44,7 +44,7 @@ const ProxyTest: React.FC = () => {
     try {
       addTestResult('Direct Questions', false, 'Testing...');
       
-      const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/questions/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/questions/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ const ProxyTest: React.FC = () => {
     try {
       addTestResult('Direct Login', false, 'Testing...');
       
-      const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/auth/login/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

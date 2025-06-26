@@ -15,7 +15,7 @@ const ConnectionTest: React.FC = () => {
 
     try {
       // Test server connection
-      const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/questions/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/questions/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const ConnectionTest: React.FC = () => {
 
     try {
       // Test connection using proxy
-      const proxyUrl = 'https://api.allorigins.win/raw?url=https://hossamoka4a.pythonanywhere.com/api/questions/';
+      const proxyUrl = `https://api.allorigins.win/raw?url=${import.meta.env.VITE_API_URL}/questions/`;
       const response = await fetch(proxyUrl, {
         method: 'GET',
         headers: {

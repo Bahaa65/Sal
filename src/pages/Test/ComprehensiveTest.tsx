@@ -52,7 +52,7 @@ const ComprehensiveTest: React.FC = () => {
     try {
       addTestResult('Direct Connection', false, 'Testing...');
       
-      const response = await fetch('https://hossamoka4a.pythonanywhere.com/api/questions/', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/questions/`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
