@@ -1,15 +1,16 @@
 import { Box, Heading, Text, Link, Flex, Icon } from '@chakra-ui/react';
 import { EmailIcon } from '@chakra-ui/icons';
 import { FaGithub } from 'react-icons/fa';
-import MainLayout from '../../components/home/MainLayout';
+import HomeHeader from '../../components/home/HomeHeader';
 
 const SUPPORT_EMAIL = 'bahaa.mohamed@robustastudio.com'; 
 const GITHUB_URL = 'https://github.com/Bahaa65/Sal'; 
 
 const Support = () => {
   return (
-    <MainLayout>
-      <Flex minH="80vh" align="center" justify="center" bg="gray.50">
+    <Box minH="100vh" bg="white">
+      <HomeHeader />
+      <Flex minH="80vh" align="center" justify="center" bg="white">
         <Box bg="white" p={8} borderRadius="lg" boxShadow="lg" maxW="400px" w="100%">
           <Heading as="h2" size="lg" mb={4} color="blue.600">Technical Support</Heading>
           <Text fontSize="md" mb={4} color="gray.700">
@@ -29,7 +30,7 @@ const Support = () => {
           </Flex>
         </Box>
       </Flex>
-    </MainLayout>
+    </Box>
   );
 };
 
