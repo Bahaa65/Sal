@@ -5,11 +5,12 @@ import { ReactNode } from 'react'
 import { pageTransition } from './common/animations'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { List, ListItem, Button, Badge, Flex, Text } from '@chakra-ui/react';
+import { List, ListItem, Button, Badge, Flex, Text, Avatar, HStack, VStack } from '@chakra-ui/react';
 import { useInfiniteNotificationsQuery } from '../hooks/useInfiniteNotificationsQuery';
 import { useInView } from 'react-intersection-observer';
 import { markNotificationAsRead } from '../services/notifications';
 import { Notification } from '../types/Notification';
+import { useNavigate } from 'react-router-dom';
 
 const MotionBox = motion.create(Box)
 
@@ -32,6 +33,7 @@ export default PageTransition
 
 export const NotificationsList = () => {
   const { ref, inView } = useInView({ triggerOnce: false });
+  const navigate = useNavigate();
   const {
     data,
     isLoading,
@@ -65,6 +67,37 @@ export const NotificationsList = () => {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Handle notification click and navigation
+  const handleNotificationClick = (notif: Notification) => {
+    // Mark as read first
+    if (!notif.is_read) {
+      markAsReadMutation.mutate(notif.id);
+    }
+    // Navigate only if question_id exists
+    if (notif.question_id) {
+      navigate(`/questions/${notif.question_id}`);
+    }
+    // else do nothing
+  };
+
+  // Get notification icon based on type
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'new_answer':
+        return '💬';
+      case 'new_question':
+        return '❓';
+      case 'vote':
+        return '👍';
+      case 'accepted_answer':
+        return '✅';
+      case 'mention':
+        return '👤';
+      default:
+        return '🔔';
+    }
+  };
 
   // Detailed English notification message based on type
   const getNotificationDetails = (notif: Notification) => {
@@ -106,7 +139,7 @@ export const NotificationsList = () => {
   if (isLoading) return (
     <Stack spacing={4} py={6}>
       {[...Array(4)].map((_, i) => (
-        <Skeleton key={i} height="48px" borderRadius="md" />
+        <Skeleton key={i} height="80px" borderRadius="md" />
       ))}
     </Stack>
   );
@@ -123,27 +156,46 @@ export const NotificationsList = () => {
             key={notif.id}
             bg={notif.is_read ? 'white' : 'blue.50'}
             borderRadius="md"
-            p={3}
+            p={4}
             boxShadow="sm"
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
+            cursor="pointer"
+            _hover={{ 
+              bg: notif.is_read ? 'gray.50' : 'blue.100',
+              transform: 'translateY(-1px)',
+              boxShadow: 'md'
+            }}
+            transition="all 0.2s"
+            onClick={() => handleNotificationClick(notif)}
+            borderLeft={!notif.is_read ? '4px solid' : 'none'}
+            borderLeftColor={!notif.is_read ? 'blue.500' : 'transparent'}
           >
-            <Box>
-              <Text fontWeight="medium">{getNotificationDetails(notif)}</Text>
-              <Text fontSize="xs" color="gray.500">{getTypeLabel(notif)}</Text>
-              <Text fontSize="xs" color="gray.500">{new Date(notif.created_at).toLocaleString()}</Text>
-            </Box>
-            {!notif.is_read && (
-              <Button
-                size="sm"
-                colorScheme="blue"
-                isLoading={markAsReadMutation.isPending && markAsReadMutation.variables === notif.id}
-                onClick={() => markAsReadMutation.mutate(notif.id)}
-              >
-                Mark as read
-              </Button>
-            )}
+            <HStack spacing={3} align="start">
+              <Box fontSize="xl" color="blue.500">
+                {getNotificationIcon(notif.type)}
+              </Box>
+              <VStack align="start" spacing={1} flex={1}>
+                <Text fontWeight="medium" fontSize="sm" color="gray.800">
+                  {getNotificationDetails(notif)}
+                </Text>
+                <HStack spacing={2}>
+                  <Badge size="sm" colorScheme="blue" variant="subtle">
+                    {getTypeLabel(notif)}
+                  </Badge>
+                  <Text fontSize="xs" color="gray.500">
+                    {new Date(notif.created_at).toLocaleString()}
+                  </Text>
+                </HStack>
+              </VStack>
+              {!notif.is_read && (
+                <Box
+                  w={2}
+                  h={2}
+                  bg="blue.500"
+                  borderRadius="full"
+                  flexShrink={0}
+                />
+              )}
+            </HStack>
           </ListItem>
         ))}
         {/* Infinite scroll observer for notifications */}
