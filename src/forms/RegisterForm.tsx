@@ -1,7 +1,8 @@
-import { FormControl, FormLabel, Input, useToast, HStack, VStack } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input, useToast, HStack, VStack, InputGroup, InputRightElement, IconButton } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useAuth } from '../contexts/AuthContext'
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthForm from '../components/auth/AuthForm'
@@ -20,6 +21,8 @@ const RegisterForm = () => {
     password: '',
   })
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const toast = useToast()
   const navigate = useNavigate()
@@ -28,6 +31,14 @@ const RegisterForm = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const handleToggleConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword)
   }
 
   const handleRegister = async () => {
@@ -226,55 +237,83 @@ const RegisterForm = () => {
 
               <FormControl id="password" isRequired>
                 <FormLabel srOnly>Password</FormLabel>
-                <Input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  bg="white"
-                  borderRadius="full"
-                  boxShadow="sm"
-                  h="40px"
-                  pl={4}
-                  border="1px solid"
-                  borderColor="gray.200"
-                  textAlign="left"
-                  isDisabled={isSubmitting}
-                  _focus={{
-                    borderColor: 'blue.400',
-                    boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
-                  }}
-                  _hover={{
-                    borderColor: 'blue.300',
-                  }}
-                />
+                <InputGroup>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="Password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    bg="white"
+                    borderRadius="full"
+                    boxShadow="sm"
+                    h="40px"
+                    pl={4}
+                    pr={12}
+                    border="1px solid"
+                    borderColor="gray.200"
+                    textAlign="left"
+                    isDisabled={isSubmitting}
+                    _focus={{
+                      borderColor: 'blue.400',
+                      boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
+                    }}
+                    _hover={{
+                      borderColor: 'blue.300',
+                    }}
+                  />
+                  <InputRightElement h="40px" pr={2}>
+                    <IconButton
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleTogglePassword}
+                      color="gray.500"
+                      _hover={{ color: "gray.700" }}
+                    />
+                  </InputRightElement>
+                </InputGroup>
               </FormControl>
 
               <FormControl id="confirmPassword" isRequired>
                 <FormLabel srOnly>Confirm Password</FormLabel>
-                <Input
-                  type="password"
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  bg="white"
-                  borderRadius="full"
-                  boxShadow="sm"
-                  h="40px"
-                  pl={4}
-                  border="1px solid"
-                  borderColor="gray.200"
-                  textAlign="left"
-                  isDisabled={isSubmitting}
-                  _focus={{
-                    borderColor: 'blue.400',
-                    boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
-                  }}
-                  _hover={{
-                    borderColor: 'blue.300',
-                  }}
-                />
+                <InputGroup>
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    bg="white"
+                    borderRadius="full"
+                    boxShadow="sm"
+                    h="40px"
+                    pl={4}
+                    pr={12}
+                    border="1px solid"
+                    borderColor="gray.200"
+                    textAlign="left"
+                    isDisabled={isSubmitting}
+                    _focus={{
+                      borderColor: 'blue.400',
+                      boxShadow: '0 0 0 1px var(--chakra-colors-blue-400)',
+                    }}
+                    _hover={{
+                      borderColor: 'blue.300',
+                    }}
+                  />
+                  <InputRightElement h="40px" pr={2}>
+                    <IconButton
+                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                      icon={showConfirmPassword ? <ViewOffIcon /> : <ViewIcon />}
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleToggleConfirmPassword}
+                      color="gray.500"
+                      _hover={{ color: "gray.700" }}
+                    />
+                  </InputRightElement>
+                </InputGroup>
               </FormControl>
             </MotionVStack>
           }
