@@ -30,9 +30,10 @@ type Answer = {
 
 type AnswerCardProps = {
   answer: Answer;
+  questionId?: number;
 };
 
-const AnswerCard = ({ answer }: AnswerCardProps) => {
+const AnswerCard = ({ answer, questionId }: AnswerCardProps) => {
   const [hidden, setHidden] = useState(false);
   const navigate = useNavigate();
   const [votes, setVotes] = useState({ upvotes: answer.upvotes, downvotes: answer.downvotes });
@@ -153,10 +154,32 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
     }
   };
 
+  const handleCardClick = () => {
+    // Navigate to the question details page using the question ID
+    if (questionId) {
+      navigate(`/questions/${questionId}`);
+    }
+  };
+
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    e.stopPropagation();
+    action();
+  };
+
   if (hidden) return null;
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" p={4} mt={4} bg="gray.50">
+    <Box 
+      borderWidth="1px" 
+      borderRadius="lg" 
+      p={4} 
+      mt={4} 
+      bg="gray.50"
+      cursor="pointer"
+      _hover={{ bg: 'gray.100' }}
+      transition="background 0.2s"
+      onClick={handleCardClick}
+    >
       <Flex align="center" mb={3}>
         <Avatar name={`${answer.user.first_name} ${answer.user.last_name}`} src={answer.user.avatar} mr={3} size="sm" />
         <Box>
@@ -165,21 +188,27 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
         </Box>
         <Spacer />
         <Menu>
-          <MenuButton as={IconButton} icon={<Icon as={FiMoreVertical} />} variant="ghost" size="sm" />
+          <MenuButton 
+            as={IconButton} 
+            icon={<Icon as={FiMoreVertical} />} 
+            variant="ghost" 
+            size="sm" 
+            onClick={(e) => handleButtonClick(e, () => {})}
+          />
           <MenuList>
-            <MenuItem icon={<Icon as={FiX} />} onClick={handleHide}>
+            <MenuItem icon={<Icon as={FiX} />} onClick={(e) => handleButtonClick(e, handleHide)}>
               Hide Comment
             </MenuItem>
-            <MenuItem icon={<Icon as={FiUser} />} onClick={handleViewProfile}>
+            <MenuItem icon={<Icon as={FiUser} />} onClick={(e) => handleButtonClick(e, handleViewProfile)}>
               View Publisher Profile
             </MenuItem>
             {isAnswerOwner && (
-              <MenuItem icon={<Icon as={FiTrash2} />} onClick={() => setIsDeleteDialogOpen(true)}>
+              <MenuItem icon={<Icon as={FiTrash2} />} onClick={(e) => handleButtonClick(e, () => setIsDeleteDialogOpen(true))}>
                 Delete Answer
               </MenuItem>
             )}
             {/* Temporary: Always show delete option for debugging */}
-            <MenuItem icon={<Icon as={FiTrash2} />} onClick={() => setIsDeleteDialogOpen(true)}>
+            <MenuItem icon={<Icon as={FiTrash2} />} onClick={(e) => handleButtonClick(e, () => setIsDeleteDialogOpen(true))}>
               Delete Answer
             </MenuItem>
           </MenuList>
@@ -207,7 +236,7 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
             variant={userVote === true ? "solid" : "ghost"}
             colorScheme={userVote === true ? "blue" : "gray"}
             size="sm" 
-            onClick={() => handleVote(1)} 
+            onClick={(e) => handleButtonClick(e, () => handleVote(1))} 
           />
           <Text>{votes.upvotes}</Text>
         </HStack>
@@ -218,7 +247,7 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
             variant={userVote === false ? "solid" : "ghost"}
             colorScheme={userVote === false ? "red" : "gray"}
             size="sm" 
-            onClick={() => handleVote(2)} 
+            onClick={(e) => handleButtonClick(e, () => handleVote(2))} 
           />
           <Text>{votes.downvotes}</Text>
         </HStack>
@@ -238,10 +267,10 @@ const AnswerCard = ({ answer }: AnswerCardProps) => {
               Are you sure you want to delete this answer? This action cannot be undone.
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={() => setIsDeleteDialogOpen(false)}>
+              <Button ref={cancelRef} onClick={(e) => handleButtonClick(e, () => setIsDeleteDialogOpen(false))}>
                 Cancel
               </Button>
-              <Button colorScheme="red" onClick={handleDelete} ml={3}>
+              <Button colorScheme="red" onClick={(e) => handleButtonClick(e, handleDelete)} ml={3}>
                 Delete
               </Button>
             </AlertDialogFooter>

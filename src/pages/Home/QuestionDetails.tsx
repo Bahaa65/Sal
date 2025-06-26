@@ -140,7 +140,7 @@ const QuestionDetails = () => {
                 {loadingAnswers ? (
                   <Skeleton height="60px" borderRadius="md" />
                 ) : answers && answers.length > 0 ? (
-                  answers.map((ans: any) => <AnswerCard key={ans.id} answer={ans} />)
+                  answers.map((ans: any) => <AnswerCard key={ans.id} answer={ans} questionId={question.id} />)
                 ) : (
                   <Text color="gray.400" textAlign="center">No answers yet.</Text>
                 )}
