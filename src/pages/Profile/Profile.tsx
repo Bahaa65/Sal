@@ -22,7 +22,6 @@ import { useProfilePageData } from '../../hooks/useProfilePageData';
 const Profile = () => {
   const { username } = useParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { logout } = useAuth();
   const navigate = useNavigate();
   const { data: profile, isLoading, error, refetch } = username
     ? useUserProfileQuery(username)
@@ -65,11 +64,6 @@ const Profile = () => {
           <Text color="gray.500" mt={2}>{userToShow.bio}</Text>
           {!username && (
             <Button mt={4} colorScheme="blue" onClick={onOpen}>Edit Profile</Button>
-          )}
-          {!username && (
-            <Button mt={2} colorScheme="red" variant="outline" onClick={() => { logout(); navigate('/login'); }}>
-             Logout
-            </Button>
           )}
           {username && (
             <Box mt={2} mb={2} px={3} py={1} bg="gray.100" borderRadius="full" fontSize="sm" color="gray.600">
