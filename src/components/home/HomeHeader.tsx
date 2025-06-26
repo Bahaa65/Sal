@@ -53,9 +53,6 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
 
   const queryClient = useQueryClient();
 
-  // Check if we're on profile page
-  const isOnProfilePage = location.pathname === '/profile' || location.pathname.startsWith('/users/');
-
   // Check if we're on current user's profile page (not other user's profile)
   const isOnCurrentUserProfile = location.pathname === '/profile';
 

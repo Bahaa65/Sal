@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Box, Button, Flex, Avatar, Text, Input, IconButton, VStack, HStack, useToast, Skeleton, Divider, Menu, MenuButton, MenuList, MenuItem, Spacer, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, useDisclosure } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
-import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX, FiTrash2 } from 'react-icons/fi';
+import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX, FiTrash2, FiMessageCircle } from 'react-icons/fi';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import MainLayout from '../../components/home/MainLayout';
@@ -86,7 +86,6 @@ const QuestionDetails = () => {
             <Skeleton height="200px" borderRadius="lg" />
           ) : question ? (
             <Box>
-              {/* تصميم منفصل للسؤال */}
               <Flex align="center" mb={3}>
                 <Avatar name={question.user.full_name || question.user.username} src={question.user.avatar} mr={3} />
                 <Box>
@@ -117,12 +116,11 @@ const QuestionDetails = () => {
                   <Text>{votes.downvotes}</Text>
                 </HStack>
                 <HStack>
-                  <Text color="blue.600">💬</Text>
+                  <IconButton aria-label="Comments" icon={<FiMessageCircle />} variant="ghost" colorScheme="blue" size="sm" />
                   <Text>{question.answers_count || 0}</Text>
                 </HStack>
               </HStack>
               <Divider mb={4} />
-              {/* إدخال الإجابة: فقط لفتح AnswerModal */}
               <Flex align="center" mb={6}>
                 <Avatar size="sm" name={user ? user.first_name + ' ' + user.last_name : 'You'} src={user?.avatar} mr={2} />
                 <Input
@@ -135,7 +133,6 @@ const QuestionDetails = () => {
                 />
               </Flex>
               <AnswerModal isOpen={isOpen} onClose={onClose} questionId={question.id} />
-              {/* قائمة الإجابات */}
               <VStack align="stretch" spacing={4}>
                 {loadingAnswers ? (
                   <Skeleton height="60px" borderRadius="md" />
@@ -145,7 +142,6 @@ const QuestionDetails = () => {
                   <Text color="gray.400" textAlign="center">No answers yet.</Text>
                 )}
               </VStack>
-              {/* حوار تأكيد الحذف */}
               <AlertDialog
                 isOpen={isDeleteDialogOpen}
                 leastDestructiveRef={cancelRef}

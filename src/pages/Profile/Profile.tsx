@@ -13,8 +13,6 @@ import {
 } from "@chakra-ui/react";
 import MainLayout from '../../components/home/MainLayout';
 import EditProfileModal from './EditProfileModal';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { useProfileQuery } from '../../hooks/useProfileQuery';
 import { useUserProfileQuery } from '../../hooks/useUserProfileQuery';
 import { useProfilePageData } from '../../hooks/useProfilePageData';
@@ -22,7 +20,6 @@ import { useProfilePageData } from '../../hooks/useProfilePageData';
 const Profile = () => {
   const { username } = useParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const navigate = useNavigate();
   const { data: profile, isLoading, error, refetch } = username
     ? useUserProfileQuery(username)
     : useProfileQuery();
