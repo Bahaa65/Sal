@@ -5,7 +5,7 @@ import { ReactNode } from 'react'
 import { pageTransition } from './common/animations'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { List, ListItem, Button, Badge, Flex, Text, Avatar, HStack, VStack } from '@chakra-ui/react';
+import { List, ListItem, Button, Badge, Flex, Text, HStack, VStack } from '@chakra-ui/react';
 import { useInfiniteNotificationsQuery } from '../hooks/useInfiniteNotificationsQuery';
 import { useInView } from 'react-intersection-observer';
 import { markNotificationAsRead } from '../services/notifications';
