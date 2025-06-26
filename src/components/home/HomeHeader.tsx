@@ -8,7 +8,6 @@ import {
   Avatar, 
   IconButton, 
   HStack, 
-  Spacer, 
   Image, 
   Text, 
   Badge,
@@ -107,45 +106,49 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
         as="header"
         bg="#0078D4"
         color="white"
-        p="16px 32px"
+        p={["8px", "16px"]}
         align="center"
         boxShadow="md"
         direction="row"
+        overflow="hidden"
       >
-        {/* Logo and text on the left */}
-        <HStack spacing="8px" mr={4}>
-          <Image src="/images/logo.png" alt="Sal Logo" maxH="36px" filter="invert(1) brightness(2)" />
-          <Text fontSize="16px" color="whiteAlpha.800">any question</Text>
-        </HStack>
-        <Spacer />
-        {/* Search in the center - only show if showSearch is true */}
-        {showSearch && (
-          <InputGroup flex="1" maxWidth="300px" mx="auto">
-            <InputLeftElement
-              pointerEvents="none"
-              children={<SearchIcon color="gray.300" boxSize="20px" />}
-            />
-            <Input
-              type="text"
-              placeholder="Search questions..."
-              bg="white"
-              borderRadius="full"
-              h="36px"
-              color="black"
-              textAlign="left"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-          </InputGroup>
-        )}
-        <Spacer />
-        {/* User icons on the right */}
-        <HStack spacing="18px" ml={4} minW="224px" maxW="224px" w="224px" justify="flex-end">
+        {/* Left: Logo */}
+        <Box flexShrink={0} mr={2}>
+          <HStack spacing={["2px", "6px", "12px"]}>
+            <Image src="/images/logo.png" alt="Sal Logo" maxH={["24px", "32px", "36px"]} filter="invert(1) brightness(2)" />
+            <Text fontSize={["14px", "16px", "16px"]} color="whiteAlpha.800" display={{ base: "none", md: "inline" }}>any question</Text>
+          </HStack>
+        </Box>
+        {/* Center: Search bar */}
+        <Box flex="1" display="flex" justifyContent="center" mx={2}>
+          {showSearch && (
+            <InputGroup maxWidth="300px" w="100%">
+              <InputLeftElement
+                pointerEvents="none"
+                children={<SearchIcon color="gray.300" boxSize={["16px", "20px", "20px"]} />}
+              />
+              <Input
+                type="text"
+                placeholder="Search questions..."
+                bg="white"
+                borderRadius="full"
+                h={["28px", "36px", "36px"]}
+                color="black"
+                textAlign="left"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                fontSize={["sm", "md", "md"]}
+              />
+            </InputGroup>
+          )}
+        </Box>
+        {/* Right: User icons */}
+        <HStack spacing={["2px", "6px", "12px"]} flexShrink={0}>
           <IconButton
             aria-label="Home"
-            icon={<Box as={FaHome} boxSize="20px" color="white" />}
+            icon={<Box as={FaHome} boxSize={["20px", "24px", "28px"]} color="white" />}
             isRound={true}
-            size="md"
+            size={["sm", "md", "md"]}
             bg="transparent"
             color="white"
             _hover={{ bg: 'blue.600' }}
@@ -156,7 +159,7 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
             aria-label="Notifications"
             icon={
               <Box position="relative">
-                <BellIcon boxSize="20px" color="white" />
+                <BellIcon boxSize={["20px", "24px", "28px"]} color="white" />
                 {data?.unread_count > 0 && (
                   <Badge
                     colorScheme="red"
@@ -172,7 +175,7 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
               </Box>
             }
             isRound={true}
-            size="md"
+            size={["sm", "md", "md"]}
             bg="transparent"
             color="white"
             _hover={{ bg: 'blue.600' }}
@@ -183,15 +186,14 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
           <IconButton
             aria-label="Technical Support"
             title="Technical Support"
-            icon={<QuestionOutlineIcon boxSize="20px" color="white" />}
+            icon={<QuestionOutlineIcon boxSize={["20px", "24px", "28px"]} color="white" />}
             isRound={true}
-            size="md"
+            size={["sm", "md", "md"]}
             bg="transparent"
             color="white"
             _hover={{ bg: 'blue.600' }}
             onClick={() => navigate('/support')}
           />
-          
           {/* Profile Menu */}
           <Menu>
             <MenuButton
@@ -200,8 +202,8 @@ const HomeHeader = ({ onSearchChange, showSearch = false, searchTerm = '', setSe
               cursor="pointer"
             >
               <Avatar 
-                w="40px" 
-                h="40px" 
+                w={["28px", "36px", "40px"]}
+                h={["28px", "36px", "40px"]}
                 name={user ? `${user.first_name} ${user.last_name}` : ''} 
                 src={user?.avatar} 
               />
