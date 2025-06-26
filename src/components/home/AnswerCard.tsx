@@ -1,10 +1,11 @@
 import { Box, Flex, Avatar, Text, IconButton, HStack, Spacer, Menu, MenuButton, MenuList, MenuItem, Icon, useToast, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Button } from '@chakra-ui/react';
-import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX, FiTrash2 } from 'react-icons/fi';
+import { FiMoreVertical, FiUser, FiX, FiTrash2 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { voteAnswer, deleteAnswer } from '../../services/apiClient';
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../contexts/AuthContext";
+import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
 // This should ideally come from a shared types file
 type User = {
@@ -229,27 +230,29 @@ const AnswerCard = ({ answer, questionId }: AnswerCardProps) => {
       )}
 
       <Flex align="center" fontSize="sm" color="gray.600">
-        <HStack spacing={1} mr={4}>
-          <IconButton 
-            aria-label="Upvote" 
-            icon={<FiArrowUp />} 
-            variant={userVote === true ? "solid" : "ghost"}
-            colorScheme={userVote === true ? "blue" : "gray"}
-            size="sm" 
-            onClick={(e) => handleButtonClick(e, () => handleVote(1))} 
-          />
-          <Text>{votes.upvotes}</Text>
-        </HStack>
-        <HStack spacing={1} mr={4}>
-          <IconButton 
-            aria-label="Downvote" 
-            icon={<FiArrowDown />} 
-            variant={userVote === false ? "solid" : "ghost"}
-            colorScheme={userVote === false ? "red" : "gray"}
-            size="sm" 
-            onClick={(e) => handleButtonClick(e, () => handleVote(2))} 
-          />
-          <Text>{votes.downvotes}</Text>
+        <HStack spacing={6} color="blue.500" fontSize="lg">
+          <HStack>
+            <Icon 
+              as={FaArrowUp} 
+              boxSize={5} 
+              cursor="pointer"
+              onClick={(e) => handleButtonClick(e, () => handleVote(1))}
+              color={userVote === true ? "blue.500" : "gray.400"}
+              _hover={{ color: "blue.600" }}
+            />
+            <Text>{votes.upvotes}</Text>
+          </HStack>
+          <HStack>
+            <Icon 
+              as={FaArrowDown} 
+              boxSize={5} 
+              cursor="pointer"
+              onClick={(e) => handleButtonClick(e, () => handleVote(2))}
+              color={userVote === false ? "red.500" : "gray.400"}
+              _hover={{ color: "red.600" }}
+            />
+            <Text>{votes.downvotes}</Text>
+          </HStack>
         </HStack>
         <Spacer />
         <Text fontSize="xs" color="gray.500">{new Date(answer.created_at).toLocaleString()}</Text>

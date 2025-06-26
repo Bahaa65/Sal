@@ -24,14 +24,12 @@ import {
   Input,
 } from "@chakra-ui/react";
 import {
-  FiArrowUp,
-  FiArrowDown,
-  FiMessageCircle,
-  FiMoreVertical,
   FiUser,
   FiX,
   FiTrash2,
+  FiMoreVertical,
 } from "react-icons/fi";
+import { FaArrowUp, FaArrowDown, FaPen } from 'react-icons/fa';
 import AnswerModal from "./AnswerModal";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -295,38 +293,40 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
         </Box>
 
         <Flex align="center" fontSize="sm" color="gray.600">
-          <HStack spacing={1} mr={4}>
-            <IconButton 
-              aria-label="Upvote" 
-              icon={<FiArrowUp />} 
-              variant={userVote === true ? "solid" : "ghost"}
-              colorScheme={userVote === true ? "blue" : "gray"}
-              size="sm" 
-              onClick={(e) => handleButtonClick(e, () => handleVote(1))} 
-            />
-            <Text>{votes.upvotes}</Text>
-          </HStack>
-          <HStack spacing={1} mr={4}>
-            <IconButton 
-              aria-label="Downvote" 
-              icon={<FiArrowDown />} 
-              variant={userVote === false ? "solid" : "ghost"}
-              colorScheme={userVote === false ? "red" : "gray"}
-              size="sm" 
-              onClick={(e) => handleButtonClick(e, () => handleVote(2))} 
-            />
-            <Text>{votes.downvotes}</Text>
-          </HStack>
-          <HStack spacing={1} mr={4}>
-            <IconButton
-              aria-label={showAnswers ? "Hide Answers" : "Show Answers"}
-              icon={<FiMessageCircle />}
-              variant={showAnswers ? "solid" : "ghost"}
-              colorScheme={showAnswers ? "blue" : "gray"}
-              size="sm"
-              onClick={(e) => handleButtonClick(e, handleToggleAnswers)}
-            />
-            <Text>{question.answers_count} Answers</Text>
+          <HStack spacing={6} color="blue.500" fontSize="lg">
+            <HStack>
+              <Icon 
+                as={FaArrowUp} 
+                boxSize={5} 
+                cursor="pointer"
+                onClick={(e) => handleButtonClick(e, () => handleVote(1))}
+                color={userVote === true ? "blue.500" : "gray.400"}
+                _hover={{ color: "blue.600" }}
+              />
+              <Text>{votes.upvotes}</Text>
+            </HStack>
+            <HStack>
+              <Icon 
+                as={FaArrowDown} 
+                boxSize={5} 
+                cursor="pointer"
+                onClick={(e) => handleButtonClick(e, () => handleVote(2))}
+                color={userVote === false ? "red.500" : "gray.400"}
+                _hover={{ color: "red.600" }}
+              />
+              <Text>{votes.downvotes}</Text>
+            </HStack>
+            <HStack>
+              <Icon 
+                as={FaPen} 
+                boxSize={5} 
+                cursor="pointer"
+                onClick={(e) => handleButtonClick(e, handleToggleAnswers)}
+                color={showAnswers ? "blue.500" : "gray.400"}
+                _hover={{ color: "blue.600" }}
+              />
+              <Text>{question.answers_count}</Text>
+            </HStack>
           </HStack>
           <Spacer />
           <Text fontSize="sm" color="gray.500" whiteSpace="nowrap">

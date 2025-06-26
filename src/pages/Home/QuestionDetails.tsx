@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Box, Button, Flex, Avatar, Text, Input, IconButton, VStack, HStack, useToast, Skeleton, Divider, Menu, MenuButton, MenuList, MenuItem, Spacer, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, useDisclosure } from '@chakra-ui/react';
+import { Box, Button, Flex, Avatar, Text, Input, IconButton, VStack, HStack, useToast, Skeleton, Divider, Menu, MenuButton, MenuList, MenuItem, Spacer, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, useDisclosure, Icon } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
-import { FiArrowUp, FiArrowDown, FiMoreVertical, FiUser, FiX, FiTrash2, FiMessageCircle } from 'react-icons/fi';
+import { FiMoreVertical, FiUser, FiX, FiTrash2 } from 'react-icons/fi';
+import { FaArrowUp, FaArrowDown, FaPen } from 'react-icons/fa';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import MainLayout from '../../components/home/MainLayout';
@@ -106,17 +107,35 @@ const QuestionDetails = () => {
               </Flex>
               <Text fontSize="xl" fontWeight="semibold" mb={2}>{question.content}</Text>
               <Text color="gray.500" fontSize="sm" mb={2}>{question.created_at && new Date(question.created_at).toLocaleString()}</Text>
-              <HStack spacing={6} mb={4}>
+              <HStack spacing={6} color="blue.500" fontSize="lg" mb={4}>
                 <HStack>
-                  <IconButton aria-label="Upvote" icon={<FiArrowUp />} variant={userVote === true ? "solid" : "ghost"} colorScheme={userVote === true ? "blue" : "gray"} size="sm" onClick={() => handleVote(1)} />
+                  <Icon 
+                    as={FaArrowUp} 
+                    boxSize={5} 
+                    cursor="pointer"
+                    onClick={() => handleVote(1)}
+                    color={userVote === true ? "blue.500" : "gray.400"}
+                    _hover={{ color: "blue.600" }}
+                  />
                   <Text>{votes.upvotes}</Text>
                 </HStack>
                 <HStack>
-                  <IconButton aria-label="Downvote" icon={<FiArrowDown />} variant={userVote === false ? "solid" : "ghost"} colorScheme={userVote === false ? "red" : "gray"} size="sm" onClick={() => handleVote(2)} />
+                  <Icon 
+                    as={FaArrowDown} 
+                    boxSize={5} 
+                    cursor="pointer"
+                    onClick={() => handleVote(2)}
+                    color={userVote === false ? "red.500" : "gray.400"}
+                    _hover={{ color: "red.600" }}
+                  />
                   <Text>{votes.downvotes}</Text>
                 </HStack>
                 <HStack>
-                  <IconButton aria-label="Comments" icon={<FiMessageCircle />} variant="ghost" colorScheme="blue" size="sm" />
+                  <Icon 
+                    as={FaPen} 
+                    boxSize={5} 
+                    color="gray.400"
+                  />
                   <Text>{question.answers_count || 0}</Text>
                 </HStack>
               </HStack>
