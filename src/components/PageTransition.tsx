@@ -74,6 +74,11 @@ export const NotificationsList = () => {
     if (!notif.is_read) {
       markAsReadMutation.mutate(notif.id);
     }
+    // Navigate to url if exists
+    if (notif.url) {
+      navigate(notif.url);
+      return;
+    }
     // Navigate only if question_id exists
     if (notif.question_id) {
       navigate(`/questions/${notif.question_id}`);
@@ -101,20 +106,22 @@ export const NotificationsList = () => {
 
   // Detailed English notification message based on type
   const getNotificationDetails = (notif: Notification) => {
+    // Use content if available, otherwise message
+    const mainText = notif.content || notif.message || 'You have a new notification.';
     switch (notif.type) {
       case 'new_answer':
-        return notif.message || 'A new answer was added to your question.';
+        return mainText;
       case 'new_question':
-        return notif.message || 'A new question was posted.';
+        return mainText;
       case 'vote':
-        return notif.message || 'Your question or answer received a new vote.';
+        return mainText;
       case 'accepted_answer':
-        return notif.message || 'Your answer was accepted as the best answer.';
+        return mainText;
       case 'mention':
-        return notif.message || 'You were mentioned in a comment or answer.';
+        return mainText;
       // Add more types as needed
       default:
-        return notif.message || 'You have a new notification.';
+        return mainText;
     }
   };
 
@@ -176,6 +183,19 @@ export const NotificationsList = () => {
               <VStack align="start" spacing={1} flex={1}>
                 <Text fontWeight="medium" fontSize="sm" color="gray.800">
                   {getNotificationDetails(notif)}
+                  {notif.url && (
+                    <Button
+                      as="a"
+                      href={notif.url}
+                      target="_blank"
+                      size="xs"
+                      colorScheme="blue"
+                      variant="link"
+                      ml={2}
+                      onClick={e => e.stopPropagation()} // Prevent parent click
+                    >
+                    </Button>
+                  )}
                 </Text>
                 <HStack spacing={2}>
                   <Badge size="sm" colorScheme="blue" variant="subtle">

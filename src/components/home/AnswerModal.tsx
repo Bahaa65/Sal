@@ -85,6 +85,7 @@ const AnswerModal = ({ isOpen, onClose, questionId }: AnswerModalProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["answers", questionId] });
       queryClient.invalidateQueries({ queryKey: ["questions"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications-infinite"] });
       toast({
         title: 'Answer submitted.',
         description: 'Your answer has been posted successfully.',

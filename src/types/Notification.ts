@@ -2,6 +2,8 @@ export interface Notification {
   id: number;
   type: string;
   message: string;
+  content?: string; 
+  url?: string; 
   created_at: string;
   is_read: boolean;
   question_id?: number; // ID of the related question for navigation
