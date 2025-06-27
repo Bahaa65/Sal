@@ -170,30 +170,30 @@ const AnswerCard = ({ answer, questionId }: AnswerCardProps) => {
   if (hidden) return null;
 
   return (
-    <Box 
-      borderWidth="1px" 
-      borderRadius="lg" 
-      p={4} 
-      mt={4} 
-      bg="gray.50"
-      cursor="pointer"
-      _hover={{ bg: 'gray.100' }}
-      transition="background 0.2s"
-      onClick={handleCardClick}
-    >
-      <Flex align="center" mb={3}>
-        <Avatar name={`${answer.user.first_name} ${answer.user.last_name}`} src={answer.user.avatar} mr={3} size="sm" />
-        <Box>
-          <Text fontWeight="bold" fontSize="sm">{`${answer.user.first_name} ${answer.user.last_name}`}</Text>
-          <Text fontSize="xs" color="gray.500">{answer.user.job || 'No job title'}</Text>
-        </Box>
-        <Spacer />
+    <Flex align="flex-start" mt={4}>
+      <Avatar name={`${answer.user.first_name} ${answer.user.last_name}`} src={answer.user.avatar} size="md" mr={4} mt={2} />
+      <Box 
+        flex={1}
+        borderRadius="lg"
+        bg="gray.50"
+        p={4}
+        boxShadow="none"
+        position="relative"
+        cursor="pointer"
+        _hover={{ bg: 'gray.100' }}
+        transition="background 0.2s"
+        onClick={handleCardClick}
+      >
         <Menu>
           <MenuButton 
             as={IconButton}
-            icon={<Icon as={FiMoreVertical} color="blue.600" boxSize={7} />} 
+            icon={<Icon as={FiMoreVertical} color="blue.500" boxSize={7} />} 
             variant="ghost"
             size="md"
+            position="absolute"
+            top={3}
+            right={3}
+            aria-label="Options"
             onClick={(e) => handleButtonClick(e, () => {})}
           />
           <MenuList>
@@ -214,50 +214,39 @@ const AnswerCard = ({ answer, questionId }: AnswerCardProps) => {
             </MenuItem>
           </MenuList>
         </Menu>
-      </Flex>
-
-      <Text mb={3}>{answer.content}</Text>
-
-      {/* Show images if present */}
-      {answer.images && answer.images.length > 0 && (
-        <Flex gap={2} mb={3} wrap="wrap">
-          {answer.images.map((img, idx) => (
-            <Box key={img + idx} display="inline-block">
-              <img src={img} alt={`answer-img-${idx}`} style={{ maxWidth: 120, maxHeight: 120, borderRadius: 8, border: '1px solid #eee' }} />
-            </Box>
-          ))}
+        <Text fontWeight="bold" fontSize="sm">{`${answer.user.first_name} ${answer.user.last_name}`}</Text>
+        <Text fontSize="xs" color="gray.500">{answer.user.job || 'No job title'}</Text>
+        <Text mb={3}>{answer.content}</Text>
+        <Flex align="center" fontSize="sm" color="gray.600">
+          <Spacer />
+          <Text fontSize="xs" color="gray.500">{new Date(answer.created_at).toLocaleString()}</Text>
         </Flex>
-      )}
-
-      <Flex align="center" fontSize="sm" color="gray.600">
-        <HStack spacing={6} color="blue.500" fontSize="lg">
-          <HStack>
-            <Icon 
-              as={FaArrowUp} 
-              boxSize={5} 
-              cursor="pointer"
-              onClick={(e) => handleButtonClick(e, () => handleVote(1))}
-              color={userVote === true ? "blue.500" : "gray.400"}
-              _hover={{ color: "blue.600" }}
-            />
-            <Text>{votes.upvotes}</Text>
+        <Flex align="center" fontSize="sm" color="gray.600">
+          <HStack spacing={6} color="blue.500" fontSize="lg">
+            <HStack>
+              <Icon 
+                as={FaArrowUp} 
+                boxSize={5} 
+                cursor="pointer"
+                onClick={(e) => handleButtonClick(e, () => handleVote(1))}
+                color={userVote === true ? "blue.500" : "gray.400"}
+                _hover={{ color: "blue.600" }}
+              />
+              <Text>{votes.upvotes}</Text>
+            </HStack>
+            <HStack>
+              <Icon 
+                as={FaArrowDown} 
+                boxSize={5} 
+                cursor="pointer"
+                onClick={(e) => handleButtonClick(e, () => handleVote(2))}
+                color={userVote === false ? "blue.500" : "gray.400"}
+                _hover={{ color: "blue.600" }}
+              />
+            </HStack>
           </HStack>
-          <HStack>
-            <Icon 
-              as={FaArrowDown} 
-              boxSize={5} 
-              cursor="pointer"
-              onClick={(e) => handleButtonClick(e, () => handleVote(2))}
-              color={userVote === false ? "red.500" : "gray.400"}
-              _hover={{ color: "red.600" }}
-            />
-            <Text>{votes.downvotes}</Text>
-          </HStack>
-        </HStack>
-        <Spacer />
-        <Text fontSize="xs" color="gray.500">{new Date(answer.created_at).toLocaleString()}</Text>
-      </Flex>
-
+        </Flex>
+      </Box>
       <AlertDialog
         isOpen={isDeleteDialogOpen}
         leastDestructiveRef={cancelRef}
@@ -280,7 +269,7 @@ const AnswerCard = ({ answer, questionId }: AnswerCardProps) => {
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
-    </Box>
+    </Flex>
   );
 };
 
