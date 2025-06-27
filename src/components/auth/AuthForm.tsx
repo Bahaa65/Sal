@@ -65,7 +65,7 @@ const AuthForm = ({ onSubmit, submitButtonText, formFieldsContent, children, isS
           color="white"
           _hover={{ bg: '#006CBE' }}
           isLoading={isSubmitting}
-          loadingText="Loading..."
+          loadingText={isSubmitting ? submitButtonText : undefined}
           isDisabled={isSubmitting}
         >
           {submitButtonText}

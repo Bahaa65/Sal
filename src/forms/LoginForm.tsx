@@ -1,4 +1,4 @@
-import { FormControl, FormLabel, Input, useToast, VStack, InputGroup, InputRightElement, IconButton } from '@chakra-ui/react'
+import { FormControl, FormLabel, Input, useToast, VStack, InputGroup, InputRightElement, IconButton, Spinner, Flex } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -88,6 +88,12 @@ const LoginForm = () => {
 
   return (
     <AuthLayout>
+      {isSubmitting && (
+        <Flex position="fixed" top={0} left={0} w="100vw" h="100vh" bg="rgba(255,255,255,0.8)" zIndex={9999} align="center" justify="center" direction="column">
+          <Spinner size="xl" color="blue.500" mb={4} />
+          <span style={{ fontSize: '1.2rem', color: '#0078D4', fontWeight: 'bold' }}>Logging in...</span>
+        </Flex>
+      )}
       <MotionVStack
         spacing={6}
         variants={staggerContainer}

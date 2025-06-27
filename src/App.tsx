@@ -1,4 +1,4 @@
-import { ChakraProvider, Skeleton } from '@chakra-ui/react'
+import { ChakraProvider, Skeleton, Spinner, Flex, Text } from '@chakra-ui/react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import theme from './theme'
@@ -24,7 +24,12 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
       <Router>
-            <Suspense fallback={<Skeleton height="100vh" width="100vw" speed={1} startColor="#e2e8f0" endColor="#cbd5e1" />}> 
+            <Suspense fallback={
+              <Flex minH="100vh" align="center" justify="center" direction="column">
+                <Spinner size="xl" color="blue.500" mb={4} />
+                <Text fontSize="lg" color="gray.600">Loading...</Text>
+              </Flex>
+            }> 
               <Routes>
                 <Route path="/login" element={
                   <GuestGuard>
