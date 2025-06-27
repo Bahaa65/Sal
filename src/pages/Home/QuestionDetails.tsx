@@ -95,7 +95,7 @@ const QuestionDetails = () => {
                 </Box>
                 <Spacer />
                 <Menu>
-                  <MenuButton as={IconButton} icon={<FiMoreVertical />} variant="ghost" size="sm" />
+                  <MenuButton as={IconButton} icon={<Icon as={FiMoreVertical} color="blue.600" boxSize={7} />} variant="ghost" size="md" />
                   <MenuList>
                     <MenuItem icon={<FiX />} onClick={() => navigate('/home')}>Hide Question</MenuItem>
                     <MenuItem icon={<FiUser />} onClick={handleViewProfile}>View Publisher Profile</MenuItem>

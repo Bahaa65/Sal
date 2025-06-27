@@ -260,10 +260,10 @@ const QuestionCard = ({ question }: QuestionCardProps) => {
           <Spacer />
           <Menu>
             <MenuButton 
-              as={IconButton} 
-              icon={<Icon as={FiMoreVertical} />} 
-              variant="ghost" 
-              size="sm" 
+              as={IconButton}
+              icon={<Icon as={FiMoreVertical} color="blue.600" boxSize={7} />} 
+              variant="ghost"
+              size="md"
               onClick={(e) => handleButtonClick(e, () => {})}
             />
             <MenuList>

@@ -25,34 +25,6 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
         border="1px solid"
         borderColor="gray.200"
       >
-        {/* Right Section - Illustration */}
-        <Box
-          flex="1"
-          bg="white"
-          p={8}
-          display={{ base: 'none', md: 'flex' }}
-          justifyContent="center"
-          alignItems="center"
-          borderRight="1px solid"
-          borderColor="gray.200"
-          height="100vh"
-          width="100%"
-        >
-          <Box width="500px" height="400px" display="flex" alignItems="center" justifyContent="center">
-          <Image
-            src="/images/5167170.png"
-            alt="People asking questions illustration"
-              width="500px"
-              height="400px"
-            objectFit="contain"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement
-              target.src = "https://via.placeholder.com/500x400?text=Auth+Illustration"
-            }}
-          />
-          </Box>
-        </Box>
-
         {/* Left Section - Auth Form */}
         <Box
           bg="#EBFBFF"
@@ -61,6 +33,34 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
           boxShadow="sm"
         >
           {children}
+        </Box>
+
+        {/* Right Section - Illustration */}
+        <Box
+          flex="1"
+          bg="white"
+          p={8}
+          display={{ base: 'none', md: 'flex' }}
+          justifyContent="center"
+          alignItems="center"
+          borderLeft="1px solid"
+          borderColor="gray.200"
+          height="100vh"
+          width="100%"
+        >
+          <Box width="500px" height="400px" display="flex" alignItems="center" justifyContent="center">
+            <Image
+              src="/images/5167170.png"
+              alt="People asking questions illustration"
+              width="500px"
+              height="400px"
+              objectFit="contain"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.src = "https://via.placeholder.com/500x400?text=Auth+Illustration"
+              }}
+            />
+          </Box>
         </Box>
       </HStack>
     </Flex>

@@ -53,15 +53,29 @@ const Profile = () => {
   return (
     <MainLayout>
       <Box maxW="600px" mx="auto" mt={8} p={6} bg="white" borderRadius="lg" boxShadow="md">
-        <Flex direction="column" align="center">
+        <Flex direction="column" align="center" position="relative">
+          <Button
+            size="sm"
+            fontWeight="bold"
+            fontSize="md"
+            position="absolute"
+            top={2}
+            right={2}
+            onClick={onOpen}
+            boxShadow="sm"
+            borderRadius="full"
+            bg="white"
+            color="blue.600"
+            border="none"
+            _hover={{ bg: 'blue.500', color: 'white', textDecoration: 'none', border: 'none' }}
+          >
+            Edit Profile
+          </Button>
           <Avatar size="2xl" name={fullName} src={userToShow.avatar} mb={4} />
           <Text fontSize="lg" color="gray.500">@{userToShow.username}</Text>
           <Text fontWeight="bold" fontSize="2xl" mt={2}>{fullName}</Text>
           <Text color="gray.600" fontSize="md">{userToShow.job || "No job title"}</Text>
           <Text color="gray.500" mt={2}>{userToShow.bio}</Text>
-          {!username && (
-            <Button mt={4} colorScheme="blue" onClick={onOpen}>Edit Profile</Button>
-          )}
           {username && (
             <Box mt={2} mb={2} px={3} py={1} bg="gray.100" borderRadius="full" fontSize="sm" color="gray.600">
               User Profile
@@ -70,7 +84,7 @@ const Profile = () => {
         </Flex>
         {/* Questions section */}
         <Box mt={10}>
-          <Text fontWeight="bold" fontSize="xl" mb={4}>Questions</Text>
+          <Text fontWeight="bold" fontSize="xl" mb={4} color="blue.600">Questions</Text>
           {questionsLoading ? (
             <Stack spacing={6} py={6}>
               {[...Array(3)].map((_, i) => (
@@ -103,7 +117,7 @@ const Profile = () => {
         {/* Answers section (only for user profiles) */}
         {username && (
           <Box mt={10}>
-            <Text fontWeight="bold" fontSize="xl" mb={4}>Answers</Text>
+            <Text fontWeight="bold" fontSize="xl" mb={4} color="blue.600">Answers</Text>
             {answersLoading ? (
               <Stack spacing={6} py={6}>
                 {[...Array(3)].map((_, i) => (
